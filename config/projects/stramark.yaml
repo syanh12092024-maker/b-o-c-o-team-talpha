@@ -1,0 +1,179 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  STRAMARK — Project Configuration                    ║
+# ║  Team thị trường Châu Âu — Romania                   ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: STRAMARK
+project_name: "Stramark"
+description: "Team thị trường Châu Âu"
+currency: RON
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "STRAMARK_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: "25951156077880126"
+  app_secret: "${META_APP_SECRET}"                    # ⚠️ Actual value in .env
+  access_token: "${META_ACCESS_TOKEN}"                  # ⚠️ Actual value in .env
+  ad_account_ids:
+    - "act_817501334775697"
+    - "act_1369010934859968"
+    - "act_1528285295107514"
+  business_id: "774351398645109"
+  pixel_id: "765924812818271"
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: poscake
+
+poscake:
+  # api_key format = 32-char hex (same as PNA/AUUS1 pattern)
+  shops:
+    - name: "EU"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${POSCAKE_API_KEY}"                    # ⚠️ Actual value in .env
+      shop_id: "1635307570"
+  shop_ids:
+    - "1635307570"
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: "euShipments"
+  secondary_3pl: "TCE"
+  platform: "eushipments.com (InOut BG)"
+  client_dashboard: "https://clients2.inout.bg/cabinet"
+  client_username: "${STRAMARK_FFM_USERNAME}"           # ⚠️ Actual value in .env
+  client_password: "${STRAMARK_FFM_PASSWORD}"           # ⚠️ Actual value in .env
+  client_name: "RO - SI_COMERZ - Aurelia Wear (aurelia)"
+  api_docs: "https://documenter.getpostman.com/view/26992907/2s93Y2S2Q8"
+  api_url: "https://api1.inout.bg/api/v1"
+  api_token: "${STRAMARK_FFM_API_TOKEN}"               # ⚠️ Actual value in .env
+  company_id: 3248
+  tracking_enabled: true
+
+  # Automation config (verified 2026-02-24)
+  auto_create_order: true
+  trigger_status: 8          # packing → auto push to 3PL
+  tracking_poll_interval_hours: 2
+  stuck_order_threshold_hours: 48
+  default_shipment_content: "Clothing / Fashion"
+  client_reference_prefix: "STR"
+  test_mode: false            # LIVE since 2026-03-18
+
+  warehouse_primary:
+    name: "HelpShip Oradea"
+    country: Romania
+    transit_to_RO: "1-2 business days"
+    ffm_fee_per_order_eur: 0.90  # ≤5kg, ≤2 items
+    extra_item_fee_eur: 0.35
+    extra_5kg_fee_eur: 0.65
+    reverse_ffm_fee_eur: 0.50
+    courier_bag_a4_eur: 0.08
+    storage_per_pallet_eur: 17.00
+    min_monthly_fee_eur: 165.00  # if <300 orders/month
+
+  warehouse_secondary:
+    name: "WH Ruse"
+    country: Bulgaria
+    transit_to_RO: "2-3 business days"
+    ffm_fee_per_order_eur: 0.65
+
+  # Available couriers (verified via API 2026-02-24)
+  couriers_available:
+    - {id: 832, name: "Romania Cargus",       to_office: true,  to_address: true,  country: "Romania",  currency: "RON", cost_1kg_eur: 2.33, cod_min_eur: 0.35}
+    - {id: 17,  name: "Romania FAN Courier",  to_office: false, to_address: true,  country: "Romania",  currency: "RON", cost_1kg_eur: 2.74, cod_min_eur: 0.40}
+    - {id: 750, name: "Romania SameDay",      to_office: true,  to_address: true,  country: "Romania",  currency: "RON", cost_1kg_eur: 2.46, cod_min_eur: 0.33}
+    - {id: 812, name: "Romania GLS",          to_office: true,  to_address: true,  country: "Romania",  currency: "RON", cost_1kg_eur: 2.72, cod_min_eur: 0.40}
+    - {id: 838, name: "Bulgaria Express One", to_office: false, to_address: true,  country: "Bulgaria", currency: "EUR"}
+    - {id: 651, name: "Croatia DPD",          to_office: false, to_address: true,  country: "Croatia",  currency: "EUR"}
+    - {id: 741, name: "Slovakia GLS",         to_office: false, to_address: true,  country: "Slovakia", currency: "EUR"}
+
+  couriers_romania_pudo:
+    - {name: "Cargus PuDo",    cost_1kg_eur: 2.26, cod_min_eur: 0.35, courier_id: 832}
+    - {name: "EasyBox Locker", cost_1kg_eur: 2.14, cod_pct: 0.011,    courier_id: 750}
+    - {name: "GLS RO PuDo",   cost_1kg_eur: 2.12, cod_min_eur: 0.22, courier_id: 812}
+
+  surcharges:
+    rma_fee_eur: 1.00
+    cod_refund_fee_eur: 3.50
+    return_shipping: "by_tariff"
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: RO
+    name: "Romania"
+    currency: RON
+    warehouse: "Romania"
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: "${DISCORD_WEBHOOK_REPORT}"           # ⚠️ Actual value in .env
+  webhook_alert: "${DISCORD_WEBHOOK_ALERT}"             # ⚠️ Actual value in .env
+  webhook_etl: "${DISCORD_WEBHOOK_ETL}"                 # ⚠️ Actual value in .env
+  webhook_reconciliation: "${DISCORD_WEBHOOK_RECONCILIATION}"  # Payment verification alerts
+
+# ─── 7b. PAYMENT VERIFICATION ───
+payment_verification:
+  client_ids: ["3282", "3248"]       # Stramark euShipments accounts
+  approvers:
+    - name: "Trà My"
+      role: "Finance"
+    - name: "Grace Kim"
+      role: "Operations"
+  required_confirmations: 2
+  overdue_days: 14                   # Flag protocols not confirmed within N days
+  protokol_schedule: "Tue,Thu"       # Expected payment cycle from euShipments
+
+# ─── 8. GOOGLE SHEETS (Master Data) ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+
+# ─── 9. TEAM ───
+marketers:
+  - id: "ANHNT"
+    name: "Nguyễn Tuấn Anh"
+    role: "Leader"
+  - id: "TUKT"
+    name: "Kim Thanh Tú"
+    role: "Leader"
+  - id: "CHIPTL"
+    name: "Phạm Thị Linh Chi"
+    role: "Marketer"
+  - id: "LETC"
+    name: "Trần Cẩm Lệ"
+    role: "Marketer"
+
+# ─── 10. POS STATUS MAPPING (SOP) ───
+# Chuẩn hoá trạng thái đơn hàng POS → category cho reporting
+pos_status_mapping:
+  # Giao thành công (GREEN)
+  delivered:       { vn: "Đã nhận",         category: "GIAO_THANH_CONG", sub: "da_nhan",         note: "3PL giao xong, chưa đối soát" }
+  received_money:  { vn: "Đã thu tiền",     category: "GIAO_THANH_CONG", sub: "da_thu_tien",     note: "3PL đã đối soát tiền" }
+  # Đang giao
+  packing:         { vn: "Đang đóng hàng",  category: "DANG_GIAO",       sub: "dang_dong_hang",  note: "Kho đang đóng gói" }
+  pending:         { vn: "Chờ chuyển hàng",  category: "DANG_GIAO",       sub: "cho_chuyen_hang", note: "Đã lên vận đơn, chưa đóng hàng" }
+  shipped:         { vn: "Đã gửi hàng",     category: "DANG_GIAO",       sub: "da_gui_hang",     note: "Đang vận chuyển đến khách" }
+  # Đơn hoàn (RED)
+  returning:       { vn: "Đang hoàn",       category: "DON_HOAN",        sub: "dang_hoan",       note: "Hàng đang trên đường hoàn về kho" }
+  returned:        { vn: "Đã hoàn",         category: "DON_HOAN",        sub: "da_hoan",         note: "Hàng đã hoàn về kho" }
+  # Hủy
+  canceled:        { vn: "Đã hủy",          category: "HUY",             sub: "da_huy",          note: "Khách từ chối / không mua" }
+  # Đơn thô / Trước khi xuất
+  new:             { vn: "Mới",             category: "DON_THO",         sub: "moi",             note: "Đơn mới tạo" }
+  submitted:       { vn: "Đã xác nhận",     category: "DA_XAC_NHAN",     sub: "da_xac_nhan",     note: "CS đã confirm" }
+  waitting:        { vn: "Chờ hàng",        category: "CHO_HANG",        sub: "cho_hang",        note: "Hàng tồn kho không đủ" }
+  ordered:         { vn: "Đã đặt hàng",     category: "DA_DAT_HANG",     sub: "da_dat_hang",     note: "Đã đặt hàng nhà cung cấp" }
+
+# ─── 11. GHI CHÚ ───
+notes: |
+  - Team Châu Âu, thị trường Romania (currency: RON)
+  - 1 shop Poscake (EU: 1635307570)
+  - 3 tài khoản quảng cáo Facebook
+  - 3PL: TCE + EUShipment

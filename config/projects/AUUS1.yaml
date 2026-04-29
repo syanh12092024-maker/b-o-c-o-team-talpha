@@ -1,0 +1,182 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  AUUS1 — Project Configuration                       ║
+# ║  Team PiAlpha — Thị trường Mỹ (US) & Úc (AU)         ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: AUUS1
+project_name: "PiAlpha US-AU"
+description: "Team chạy thị trường MỸ - ÚC"
+currency: USD
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "AUUS1_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: "${AUUS1_META_APP_ID}"
+  app_secret: "${AUUS1_META_APP_SECRET}"
+  access_token: "${AUUS1_META_ACCESS_TOKEN}"       # ⚠️ Expires ~2026-04-16, renew in .env
+  ad_account_ids:
+    - "act_2002604803685498"                        # AU chính
+    - "act_900537852593889"                          # US chính
+    - "act_2026217937936451"                         # US phụ
+  business_id: "1356322402694811"
+  pixel_id: ""
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: poscake
+
+poscake:
+  # Multi-shop: api_key format = 32-char hex (NOT UUID with dashes)
+  shops:
+    - name: "US"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${AUUS1_POSCAKE_US_KEY}"
+      shop_id: "100197417"
+    - name: "AU"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${AUUS1_POSCAKE_AU_KEY}"
+      shop_id: "1328333296"
+  # Flat list cho agents filter
+  shop_ids:
+    - "100197417"
+    - "1328333296"
+
+pancake:
+  api_url: "https://pages.fm/api/v1"
+  api_token: ""
+  page_ids: []
+
+# ─── 5. FULFILLMENT (3PL) ───
+# Mô hình đặc biệt: 100% giao thành công, thu tiền sau 10-20 ngày
+# Tỷ lệ thu hồi tiền: 60-80% số đơn gửi
+fulfillment:
+  partners:
+    - name: "AMI"
+      markets: ["US"]
+      fees:
+        packing_fee: 1.0          # USD/đơn
+        delivery_fee: 10.0        # USD/đơn (trung bình)
+        cod_fee: 0                # Không có COD fee
+        return_fee: 0             # Không có phí hoàn
+      currency: USD
+    - name: "NAZA"
+      markets: ["US", "AU"]
+      fees:
+        packing_fee: 1.0          # USD/đơn  (AU tính AUD)
+        delivery_fee: 10.0        # USD/đơn  (AU tính AUD)
+        cod_fee: 0
+        return_fee: 0
+      currency: USD
+  tracking_enabled: false
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: US
+    name: "United States"
+    currency: USD
+    warehouse: "AMI, NAZA"
+  - code: AU
+    name: "Australia"
+    currency: AUD
+    warehouse: "NAZA"
+  # JAPAN — historical only, không còn active
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: "https://discord.com/api/webhooks/1471770595711516773/72_FGgbbXaM4CkQrA5EjoxNkPvnl6o2hlCugHw-L7RY36LgvQZDweUkpfPE45-ZS1WUL"
+  webhook_alert: "https://discord.com/api/webhooks/1471770595711516773/72_FGgbbXaM4CkQrA5EjoxNkPvnl6o2hlCugHw-L7RY36LgvQZDweUkpfPE45-ZS1WUL"
+  webhook_etl: "https://discord.com/api/webhooks/1471770595711516773/72_FGgbbXaM4CkQrA5EjoxNkPvnl6o2hlCugHw-L7RY36LgvQZDweUkpfPE45-ZS1WUL"
+
+# ─── 8. GOOGLE SHEETS (Master Data) ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+
+# ─── 9. TEAM ───
+marketers:
+  - id: "THANHNT"
+    name: "Nguyễn Tất Thành"
+    role: "Leader"
+  - id: "THANGNH"
+    name: "Nguyễn Hữu Thắng"
+    role: "Marketer"
+  - id: "KINHBN"
+    name: "Bùi Nguyên Kính"
+    role: "Marketer"
+  - id: "MANHDS"
+    name: "Đặng Sỹ Mạnh"
+    role: "Marketer"
+  # S.ANH — historical, không còn chạy AUUS1
+
+# ─── 10. SẢN PHẨM ───
+# ⚠️ Giá vốn cần bổ sung qua Google Sheet
+# SKU format KHÔNG thống nhất: "058 - Name" hoặc "Name - 096"
+products: []   # TODO: import từ POS + Google Sheet
+
+# ─── 11. EXCHANGE RATES ───
+exchange_rates:
+  - from: AUD
+    to: VND
+    rate: 17100
+    valid_from: "2026-02-01"
+  - from: USD
+    to: VND
+    rate: 25700
+    valid_from: "2026-02-01"
+
+# ─── 12. GIÁ BÁN (PRICING TIERS) ───
+# POS lưu giá ÷100 (19900 = $199.00)
+# Doanh thu = COD ÷ 100
+pos_price_divisor: 100
+
+pricing_tiers:
+  US:                             # USD
+    3: 199                        # Combo 3 SP = $199 (chỉ bán combo)
+    5: 299                        # Combo 5 SP = $299
+    note: "US KHÔNG bán lẻ 1-2 SP. Chỉ combo 3 hoặc 5."
+  AU:                             # AUD
+    1: 149                        # 1 SP = $149 AUD
+    2: 99                         # Combo 2 = $99  (rẻ hơn 1 SP!)
+    3: 149                        # Combo 3 = $149
+    4: 149                        # Combo 4 = $149 (100% cố định)
+    5: 249                        # Combo 5 = $249
+    10: 299                       # Combo 10 = $299
+    note: "2SP rẻ hơn 1SP. Combo 4 luôn $149."
+
+# ─── 13. KPI TARGETS ───
+kpi:
+  roas_target: 5.0                # ROAS > 5
+  backfill_days: 60               # Chưa xác nhận, tạm 60
+  backfill_from: "2025-12-21"
+
+# ─── 14. QUY TẮC VẬN HÀNH ───
+# ⚠️ MÔ HÌNH ĐẶC BIỆT — KHÁC TALPHA!
+operations:
+  delivery_model: "post-delivery-pay"   # Giao hàng xong mới thu tiền
+  delivery_success_rate: 1.0            # 100% giao thành công
+  cash_collection_rate: "60-80%"        # Chỉ 60-80% đơn thu được tiền
+  cash_collection_delay: "10-20 days"   # 10-20 ngày mới nhận tiền
+  return_policy: "none"                 # Không có return/re-stock
+  cost_source:
+    - "pos"
+    - "google_sheet"
+  fixed_costs: "pending"
+  pos_revenue_field: "cod"
+
+# ─── 15. GHI CHÚ ───
+notes: |
+  - Team PiAlpha, 2 thị trường US + AU (JAPAN đã ngừng)
+  - 2 shop Poscake (US: 100197417, AU: 1328333296)
+  - 3 active ad accounts: act_2002604803685498 (AU), act_900537852593889 (US), act_2026217937936451 (US)
+  - OLD accounts removed: act_773109749037011, act_1093049475876128, act_1371986881295946 (đã chết/expired)
+  - 3PL: AMI (US) + NAZA (US+AU), phí $1 đóng gói + $10 ship
+  - MÔ HÌNH ĐẶC BIỆT: Giao 100%, thu tiền 60-80%, delay 10-20 ngày
+  - POS giá ÷100, doanh thu = COD
+  - SKU format KHÔNG thống nhất giữa 2 shops

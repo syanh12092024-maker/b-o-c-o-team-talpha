@@ -1,0 +1,157 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  ZEN8 — Project Configuration                        ║
+# ║  E-commerce cross-border — Middle East                ║
+# ║  Updated: 2026-03-10 (Phase 0 — Architecture Design) ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: ZEN8
+project_name: "Zen8"
+description: "E-commerce cross-border Middle East (UAE, KWT, SA)"
+currency: USD
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "ZEN8_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: ""                             # Xem .env → META_APP_ID
+  app_secret: ""                         # Xem .env → META_APP_SECRET
+  access_token: ""                       # Xem .env → META_ACCESS_TOKEN (từ n8n)
+  ad_account_ids:
+    - "act_1078363024398786"             # ZN8_UAE(Hexing)_03
+    - "act_1241761350559164"             # ZN8_UAE(Hexing)_05
+    - "act_1148472697119951"             # ZN8_UAE(Hexing)_07
+    - "act_1432497617797009"             # ZN8_UAE(Hexing)_06
+    - "act_1300351188365797"             # ZN8_UAE(Hexing)_04
+    - "act_965011415652127"              # ZEN8 02
+    - "act_1591357458727608"             # ZN8_UAE(Dufei)_11
+    - "act_870646655894511"              # ZN8_UAE(Dufei)_12
+    - "act_901293159515991"              # ZN8_UAE(Dufei)_10
+    - "act_3041766905994211"             # ZN8_KWT(Hexing)_08
+    - "act_1166454102135876"             # TODO: đặt tên tài khoản
+    - "act_1691575898673054"             # ZN8_(Ruixi)KWT_13
+    - "act_1223734626141889"             # ZN8_KWT(Ruixi)_14
+    - "act_2153130052166200"             # ZN8_KWT(Hexing)_15
+    - "act_929081426187729"              # ZN8_UAE(Ruixin)_15
+  business_id: ""
+  pixel_id: ""
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: poscake
+
+poscake:
+  shops:
+    - name: "ZEN8 - ME"
+      market: "UAE+KSA"                                # Trung Đông: phân biệt bởi kho hàng
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${ZEN8_POSCAKE_API_KEY}"               # ⚠️ Actual value in .env
+      shop_id: "714234971"
+      link: "https://pos.pancake.vn/shop/714234971/order"
+      warehouses:                                      # Phân biệt thị trường bằng kho
+        - name: "KHO KSA J&T"
+          market: "KSA"
+        - name: "KHO UAE SJH"
+          market: "UAE"
+    - name: "ZEN8 KUWAIT"
+      market: "Kuwait"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${ZEN8_POSCAKE_KW_API_KEY}"            # ⚠️ Cần thêm vào .env
+      shop_id: "714951526"
+      link: "https://pos.pancake.vn/shop/714951526/order"
+    - name: "ZEN8 ÚC"
+      market: "Australia"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${ZEN8_POSCAKE_AU_API_KEY}"            # ⚠️ Cần thêm vào .env
+      shop_id: "1328971816"
+      link: "https://pos.pancake.vn/shop/1328971816/order"
+  shop_ids:
+    - "714234971"                                      # ME (UAE+KSA)
+    - "714951526"                                      # Kuwait
+    - "1328971816"                                     # Úc
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: "ajex"
+  api_url: ""
+  api_key: ""
+  api_secret: ""
+  tracking_enabled: false
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: AE
+    name: "UAE"
+    currency: AED
+    warehouse: "UAE Warehouse"
+  - code: SA
+    name: "Saudi Arabia"
+    currency: SAR
+    warehouse: "KSA Warehouse"
+  - code: KW
+    name: "Kuwait"
+    currency: KWD
+    warehouse: ""
+  - code: BH
+    name: "Bahrain"
+    currency: BHD
+    warehouse: ""
+  - code: OM
+    name: "Oman"
+    currency: OMR
+    warehouse: ""
+  - code: QA
+    name: "Qatar"
+    currency: QAR
+    warehouse: ""
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: "https://discord.com/api/webhooks/1452944167205470328/zywKLx"       # Từ n8n scan
+  webhook_alert: ""
+  webhook_etl: ""
+
+# ─── 8. GOOGLE SHEETS ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+
+# ─── 9. TEAM ───
+marketers:
+  - id: "NHAMHT"
+    name: "Mai Huỳnh Thanh Nhã"
+    role: "Marketer"
+  - id: "LYVLN"
+    name: "Võ Lê Nhật Ly"
+    role: "Marketer"
+  - id: "HUYTN"
+    name: "Trương Nhật Huy"
+    role: "Marketer"
+  - id: "DUNGNH"
+    name: "Nguyễn Hoàng Dũng"
+    role: "Marketer"
+  - id: "TAIHH"
+    name: "Huỳnh Hữu Tài"
+    role: "Marketer"
+  - id: "TUNPT"
+    name: "Nguyễn Phan Thiên Tú"
+    role: "Marketer"
+  - id: "LINHLTT"
+    name: "Lê Thị Trúc Linh"
+    role: "Marketer"
+  - id: "VUONGNM"
+    name: "Nguyễn Minh Vương"
+    role: "Marketer"
+
+# ─── 10. GHI CHÚ ───
+notes: |
+  - Dự án ME chính, 15 tài khoản quảng cáo
+  - 1 shop Poscake (ME: 714234971)
+  - BigQuery dataset: ZEN8_Dataset (MỚI — tách từ Zen8_Dataset legacy)
+  - Zen8_Dataset cũ = READ-ONLY reference
+  - n8n workflow prefix: ZN8-

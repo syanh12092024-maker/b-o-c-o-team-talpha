@@ -1,0 +1,91 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  T1 — Project Configuration                          ║
+# ║  Credentials từ AI Agent (Solar Shepard)              ║
+# ║  Data flow: APIs → BigQuery T1_Dataset → Dashboard   ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: t1
+project_name: "T1"
+description: "Dự án T1 — thị trường EU, quản lý qua Pancake POS + Facebook Ads"
+currency: VND
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "T1_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: "895759546722143"
+  app_secret: "${T1_META_APP_SECRET}"  # ⚠️ Actual value in .env
+  access_token: "${T1_META_ACCESS_TOKEN}"  # ⚠️ Actual value in .env
+  ad_account_ids:
+    - "act_2837162343341673"
+  business_id: "774351398645109"
+  pixel_id: "1453227852403293"
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: pancake
+
+pancake:
+  api_url: "https://pos.pages.fm/api/v1"
+  api_token: "${T1_PANCAKE_API_TOKEN}"  # ⚠️ Actual value in .env
+  page_ids:
+    - "714928388"
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: "euShipments"
+  platform: "eushipments.com (InOut BG)"
+  api_url: "https://api1.inout.bg/api/v1"
+  api_token: "${T1_FFM_API_TOKEN}"  # ⚠️ Actual value in .env
+  sender_id: 3284                          # SI_LEVELUPVN Ltd - Oddie House
+  default_courier_id: 741                 # Slovakia GLS
+  warehouse: "HelpShip Oradea"
+  tracking_enabled: true
+  client_reference_prefix: "T1"
+
+  # Automation config
+  auto_create_order: true
+  trigger_status: 8                       # status=8 → packing (đang đóng hàng)
+  test_mode: true                         # ← Đổi false khi go-live
+  default_shipment_content: "Clothing / Fashion"
+
+  # Slovakia GLS courier details
+  couriers_available:
+    - {id: 741, name: "Slovakia GLS", to_office: false, to_address: true, currency: "EUR"}
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: SK
+    name: "Slovakia"
+    currency: EUR
+    warehouse: "HelpShip Oradea"
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: ""
+  webhook_alert: ""
+
+# ─── 8. GOOGLE SHEETS (Master Data) ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+
+# ─── 9. TEAM ───
+marketers:
+  - id: ""
+    name: ""
+    role: ""
+
+# ─── 10. GHI CHÚ ───
+notes: |
+  - Dự án T1, thị trường EU, currency VND
+  - POS: Pancake POS (pages.fm), shop 714928388
+  - 1 tài khoản quảng cáo Facebook: act_2837162343341673
+  - Dữ liệu sync qua BigQuery T1_Dataset (không gọi API trực tiếp)
+  - Credentials lấy từ dự án AI Agent (Solar Shepard) 

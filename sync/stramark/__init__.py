@@ -1,0 +1,1 @@
+# Stramark sync modules

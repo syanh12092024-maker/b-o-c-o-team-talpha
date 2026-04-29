@@ -1,0 +1,21 @@
+### Functionalities
+By using API integration with euShipments.com, you can significantly enhance your order fulfillment process, leading to improved customer satisfaction and operational efficiency.
+API integration between us and your e-shop enables a range of functionalities to optimize your online sales and business analytics:
+Reporting on the stock quantity of your products in each fulfillment location
+Information about active statuses of the orders
+Tracking information and detailed history of each air waybill
+Data and statistics about payments
+Product, bundles and shipments generation
+Air waybills (AWB) creation
+Fulfillment order creation
+Full Cash-on-delivery reports and analytics
+
+### Benefits
+You can easily simplify your logistics and expand your reach by connecting your online store to our WMS. This connection is made possible through API integration, which helps your business grow smoothly across Europe.
+Having integrated your online store with our system through API, you could benefit from:
+Complete automation of order processing
+Saving time and efforts from manual processing of each individual shipment
+Reducing the risk of human errors
+Full access to our extensive logistics network
+Quick and easy activation of a new international market in Europe
+24/7 tracking of your shipments

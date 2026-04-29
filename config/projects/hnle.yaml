@@ -1,0 +1,125 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  HNLE — Project Configuration                        ║
+# ║  E-commerce cross-border — Middle East & Australia    ║
+# ║  Updated: 2026-03-10 (Phase 0 — Architecture Design) ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: HNLE
+project_name: "HNLE"
+description: "E-commerce cross-border Middle East & Australia"
+currency: USD
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "HNLE_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: ""
+  app_secret: ""
+  access_token: "${HNLE_META_ACCESS_TOKEN}"      # ⚠️ Actual value in .env
+  ad_account_ids:
+    - "act_4436251663362042"             # TDF_UC(Dufei)_01 → Đức
+    - "act_862258773090270"              # HNLE_UC_01 → Đức
+    - "act_1801091267209683"             # NHAT TK 07
+    - "act_2013093525898990"             # NHAT TK 06
+    - "act_1188914743330947"             # DUC TK 03
+    - "act_850593750862900"              # TUNG TK 05
+  business_id: ""
+  pixel_id: ""
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: poscake
+
+poscake:
+  shops:
+    - name: "ME"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${HNLE_POSCAKE_API_KEY}"              # ⚠️ Actual value in .env
+      shop_id: "1942963908"
+    - name: "AU"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${HNLE_POSCAKE_API_KEY}"              # ⚠️ Actual value in .env (dùng chung)
+      shop_id: "1942963943"
+  shop_ids:
+    - "1942963908"
+    - "1942963943"
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: ""                        # TODO: Boss cung cấp
+  api_url: ""
+  api_key: ""
+  api_secret: ""
+  tracking_enabled: false
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: ME
+    name: "Middle East"
+    currency: USD
+    warehouse: ""
+  - code: AE
+    name: "UAE"
+    currency: AED
+    warehouse: ""
+  - code: SA
+    name: "Saudi Arabia"
+    currency: SAR
+    warehouse: ""
+  - code: KW
+    name: "Kuwait"
+    currency: KWD
+    warehouse: ""
+  - code: AU
+    name: "Australia"
+    currency: AUD
+    warehouse: ""
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: ""                     # TODO: Boss cung cấp
+  webhook_alert: ""
+  webhook_etl: ""
+
+# ─── 8. GOOGLE SHEETS ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+
+# ─── 9. TEAM ───
+marketers:
+  - id: "TUNGNT"
+    name: "Nguyễn Thanh Tùng"
+    role: "Marketer"
+  - id: "THACHTD"
+    name: "Tạ Đình Thạch"
+    role: "Marketer"
+  - id: "NHATTM"
+    name: "Trần Minh Nhật"
+    role: "Marketer"
+  - id: "DUCNV"
+    name: "Nguyễn Văn Đức"
+    role: "Marketer"
+  - id: "VANDTH"
+    name: "Đàm Thị Hồng Vân"
+    role: "Marketer"
+  - id: "HUYENLT"
+    name: "Lê Thanh Huyền"
+    role: "Marketer"
+
+# ─── 10. GHI CHÚ ───
+notes: |
+  - Alias trong n8n: HLNE (prefix: HLNE-)
+  - 2 shops Poscake: ME (1942963908) + AU (1942963943)
+  - POS API Key: xem .env → HNLE_POSCAKE_API_KEY (dùng chung)
+  - BigQuery dataset: HNLE_Dataset (MỚI)
+  - Zen8_Dataset cũ = READ-ONLY reference
+  - 6 tài khoản quảng cáo: TDF_UC(Đức), HNLE_UC(Đức), Nhật TK06/07, Đức TK03, Tùng TK05
+  - 6 marketers: Nguyễn Thanh Tùng (TUNGNT), Tạ Đình Thạch (THACHTD), Trần Minh Nhật (NHATTM), Nguyễn Văn Đức (DUCNV), Đàm Thị Hồng Vân (VANDTH), Lê Thanh Huyền (HUYENLT)
+  - N8n workflow chỉ có Ads pipeline, chưa có POS sync

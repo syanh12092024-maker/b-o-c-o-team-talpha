@@ -1,0 +1,946 @@
+analysis_period: Last 60 days (2025-12-22 to 2026-02-20)
+summary:
+  total_ads_spend_vnd: 433346770
+  selling_ads_spend_vnd: 418660400
+  selling_ads_pct: 96.6
+  test_ads_spend_vnd: 14686370
+  test_ads_pct: 3.4
+  selling_products: 10
+  test_products: 21
+  pos_products_60d: 51
+  pos_without_ads: 43
+selling_ads:
+  097:
+    pos_name: 097 - Hoegoa Rosemary Keratin
+    campaign_names:
+    - MỌCTOC
+    - MỌC TÓC
+    - Mọc tóc
+    confidence: HIGH
+    ads_spend: 157782705
+    impressions: 320541
+    reach: 295047
+    messages: 2290
+    campaigns: 5
+    pos_orders: 255
+    pos_revenue: 135151500
+    by_marketer:
+      Mạnh:
+        spend: 138849636
+        campaigns: 3
+        impressions: 293294
+        reach: 271640
+        messages: 2003
+        cpm: 473415
+      Thành:
+        spend: 18933069
+        campaigns: 2
+        impressions: 27247
+        reach: 23407
+        messages: 287
+        cpm: 694868
+    roas: 0.86
+    cpm: 492239
+  '119':
+    pos_name: 119 - Retinol Cream
+    campaign_names:
+    - Kem xoá nhăn hồng
+    - Retinol Cream
+    confidence: MEDIUM
+    ads_spend: 67452469
+    impressions: 78831
+    reach: 68686
+    messages: 831
+    campaigns: 6
+    pos_orders: 20
+    pos_revenue: 2458500
+    by_marketer:
+      Thành:
+        spend: 67452469
+        campaigns: 6
+        impressions: 78831
+        reach: 68686
+        messages: 831
+        cpm: 855659
+    roas: 0.04
+    cpm: 855659
+  '071':
+    pos_name: 071 - Ginseng Serum
+    campaign_names:
+    - SERUMNHANSAM
+    - PAGEMOISERUMNHANSAM
+    confidence: HIGH
+    ads_spend: 47020912
+    impressions: 77922
+    reach: 68309
+    messages: 627
+    campaigns: 2
+    pos_orders: 62
+    pos_revenue: 60918000
+    by_marketer:
+      Mạnh:
+        spend: 47020912
+        campaigns: 2
+        impressions: 77922
+        reach: 68309
+        messages: 627
+        cpm: 603436
+    roas: 1.3
+    cpm: 603436
+  '116':
+    pos_name: 116 - Tgideas Shampoo
+    campaign_names:
+    - dầu gội  Fa Le Mei
+    confidence: MEDIUM
+    ads_spend: 44549980
+    impressions: 84460
+    reach: 70922
+    messages: 642
+    campaigns: 6
+    pos_orders: 0
+    pos_revenue: 0
+    by_marketer:
+      Mạnh:
+        spend: 36620543
+        campaigns: 3
+        impressions: 69184
+        reach: 58304
+        messages: 526
+        cpm: 529321
+      Thắng:
+        spend: 7929437
+        campaigns: 3
+        impressions: 15276
+        reach: 12618
+        messages: 116
+        cpm: 519078
+    roas: 0.0
+    cpm: 527468
+  '114':
+    pos_name: 114 - Breast Hip Enhancement Cream
+    campaign_names:
+    - Kem nở mông ngực
+    confidence: HIGH
+    ads_spend: 35073685
+    impressions: 65117
+    reach: 54446
+    messages: 405
+    campaigns: 3
+    pos_orders: 54
+    pos_revenue: 31960500
+    by_marketer:
+      Thành:
+        spend: 35073685
+        campaigns: 3
+        impressions: 65117
+        reach: 54446
+        messages: 405
+        cpm: 538626
+    roas: 0.91
+    cpm: 538626
+  '103':
+    pos_name: 103/104 - STONE WATCH BRACELET
+    campaign_names:
+    - Đồng hồ 18k
+    confidence: HIGH
+    ads_spend: 30526268
+    impressions: 54648
+    reach: 46432
+    messages: 561
+    campaigns: 1
+    pos_orders: 27
+    pos_revenue: 9834000
+    by_marketer:
+      Mạnh:
+        spend: 30526268
+        campaigns: 1
+        impressions: 54648
+        reach: 46432
+        messages: 561
+        cpm: 558598
+    roas: 0.32
+    cpm: 558598
+  '112':
+    pos_name: 112 - Firming Body Cream
+    campaign_names:
+    - Lotion tắm trắng
+    - Body Lotion
+    confidence: MEDIUM
+    ads_spend: 21032918
+    impressions: 32133
+    reach: 26381
+    messages: 228
+    campaigns: 4
+    pos_orders: 114
+    pos_revenue: 84942000
+    by_marketer:
+      Mạnh:
+        spend: 17693077
+        campaigns: 1
+        impressions: 27442
+        reach: 22665
+        messages: 202
+        cpm: 644744
+      Thành:
+        spend: 1802674
+        campaigns: 1
+        impressions: 2893
+        reach: 2396
+        messages: 14
+        cpm: 623116
+      Kính:
+        spend: 1537167
+        campaigns: 2
+        impressions: 1798
+        reach: 1320
+        messages: 12
+        cpm: 854932
+    roas: 4.04
+    cpm: 654558
+  BRA:
+    pos_name: 028-042 - Bra Collection
+    campaign_names:
+    - AONGUC
+    confidence: HIGH
+    ads_spend: 8826767
+    impressions: 12805
+    reach: 10933
+    messages: 137
+    campaigns: 1
+    pos_orders: 0
+    pos_revenue: 0
+    by_marketer:
+      Mạnh:
+        spend: 8826767
+        campaigns: 1
+        impressions: 12805
+        reach: 10933
+        messages: 137
+        cpm: 689322
+    roas: 0.0
+    cpm: 689322
+  088:
+    pos_name: 088 - Body Lotion Hally
+    campaign_names:
+    - Hally Body Lotion
+    confidence: HIGH
+    ads_spend: 4794781
+    impressions: 7230
+    reach: 5890
+    messages: 57
+    campaigns: 1
+    pos_orders: 36
+    pos_revenue: 50490000
+    by_marketer:
+      Thành:
+        spend: 4794781
+        campaigns: 1
+        impressions: 7230
+        reach: 5890
+        messages: 57
+        cpm: 663179
+    roas: 10.53
+    cpm: 663179
+  087:
+    pos_name: 087 - SUNCREEN CREAM
+    campaign_names:
+    - kemchongnangI
+    confidence: HIGH
+    ads_spend: 1599915
+    impressions: 2941
+    reach: 2593
+    messages: 29
+    campaigns: 1
+    pos_orders: 24
+    pos_revenue: 12771000
+    by_marketer:
+      Mạnh:
+        spend: 1599915
+        campaigns: 1
+        impressions: 2941
+        reach: 2593
+        messages: 29
+        cpm: 544004
+    roas: 7.98
+    cpm: 544004
+test_ads:
+  Son tự bù màu:
+    ads_spend: 1437337
+    impressions: 2815
+    reach: 2267
+    messages: 39
+    cpm: 510599
+    msg_rate_pct: 1.72
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: POTENTIAL
+    by_marketer:
+      Thành:
+        spend: 1437337
+        campaigns: 1
+        impressions: 2815
+        reach: 2267
+        messages: 39
+        cpm: 510599
+        msg_rate_pct: 1.72
+  Serum Aobenz:
+    ads_spend: 1369828
+    impressions: 3209
+    reach: 2477
+    messages: 30
+    cpm: 426871
+    msg_rate_pct: 1.21
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 1369828
+        campaigns: 1
+        impressions: 3209
+        reach: 2477
+        messages: 30
+        cpm: 426871
+        msg_rate_pct: 1.21
+  Bee Venom:
+    ads_spend: 1339005
+    impressions: 3121
+    reach: 2673
+    messages: 31
+    cpm: 429031
+    msg_rate_pct: 1.16
+    campaigns: 1
+    campaign_types:
+    - '2512'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 1339005
+        campaigns: 1
+        impressions: 3121
+        reach: 2673
+        messages: 31
+        cpm: 429031
+        msg_rate_pct: 1.16
+  Kem trị sẹo:
+    ads_spend: 1304253
+    impressions: 4286
+    reach: 3480
+    messages: 38
+    cpm: 304305
+    msg_rate_pct: 1.09
+    campaigns: 1
+    campaign_types:
+    - '2512'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 1304253
+        campaigns: 1
+        impressions: 4286
+        reach: 3480
+        messages: 38
+        cpm: 304305
+        msg_rate_pct: 1.09
+  Ống xoá nhăn:
+    ads_spend: 944448
+    impressions: 1739
+    reach: 1585
+    messages: 76
+    cpm: 543098
+    msg_rate_pct: 4.79
+    campaigns: 2
+    campaign_types:
+    - '2512'
+    - '2712'
+    evaluation: WIN
+    by_marketer:
+      Thành:
+        spend: 944448
+        campaigns: 2
+        impressions: 1739
+        reach: 1585
+        messages: 76
+        cpm: 543098
+        msg_rate_pct: 4.79
+  LÔNG MI GIẢ:
+    ads_spend: 932681
+    impressions: 1425
+    reach: 1218
+    messages: 7
+    cpm: 654513
+    msg_rate_pct: 0.57
+    campaigns: 1
+    campaign_types:
+    - '26'
+    evaluation: AVERAGE
+    by_marketer:
+      Mạnh:
+        spend: 932681
+        campaigns: 1
+        impressions: 1425
+        reach: 1218
+        messages: 7
+        cpm: 654513
+        msg_rate_pct: 0.57
+  LÂYRAYTAI:
+    ads_spend: 827986
+    impressions: 2029
+    reach: 1640
+    messages: 28
+    cpm: 408076
+    msg_rate_pct: 1.71
+    campaigns: 1
+    campaign_types:
+    - '12'
+    evaluation: POTENTIAL
+    by_marketer:
+      Mạnh:
+        spend: 827986
+        campaigns: 1
+        impressions: 2029
+        reach: 1640
+        messages: 28
+        cpm: 408076
+        msg_rate_pct: 1.71
+  Mặt nạ collagen:
+    ads_spend: 810339
+    impressions: 1392
+    reach: 1149
+    messages: 18
+    cpm: 582140
+    msg_rate_pct: 1.57
+    campaigns: 1
+    campaign_types:
+    - '2512'
+    evaluation: POTENTIAL
+    by_marketer:
+      Thành:
+        spend: 810339
+        campaigns: 1
+        impressions: 1392
+        reach: 1149
+        messages: 18
+        cpm: 582140
+        msg_rate_pct: 1.57
+  Kem mắt:
+    ads_spend: 800571
+    impressions: 1664
+    reach: 1210
+    messages: 26
+    cpm: 481112
+    msg_rate_pct: 2.15
+    campaigns: 1
+    campaign_types:
+    - '2512'
+    evaluation: POTENTIAL
+    by_marketer:
+      Thành:
+        spend: 800571
+        campaigns: 1
+        impressions: 1664
+        reach: 1210
+        messages: 26
+        cpm: 481112
+        msg_rate_pct: 2.15
+  Trắng răng:
+    ads_spend: 773211
+    impressions: 2235
+    reach: 1880
+    messages: 24
+    cpm: 345956
+    msg_rate_pct: 1.28
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 773211
+        campaigns: 1
+        impressions: 2235
+        reach: 1880
+        messages: 24
+        cpm: 345956
+        msg_rate_pct: 1.28
+  QUẦN ĐỘN MÔNG:
+    ads_spend: 695744
+    impressions: 1541
+    reach: 1187
+    messages: 17
+    cpm: 451489
+    msg_rate_pct: 1.43
+    campaigns: 1
+    campaign_types:
+    - '6.1'
+    evaluation: AVERAGE
+    by_marketer:
+      Mạnh:
+        spend: 695744
+        campaigns: 1
+        impressions: 1541
+        reach: 1187
+        messages: 17
+        cpm: 451489
+        msg_rate_pct: 1.43
+  Patch dưỡng nhan:
+    ads_spend: 634868
+    impressions: 1028
+    reach: 759
+    messages: 8
+    cpm: 617576
+    msg_rate_pct: 1.05
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 634868
+        campaigns: 1
+        impressions: 1028
+        reach: 759
+        messages: 8
+        cpm: 617576
+        msg_rate_pct: 1.05
+  XAPHONGNAM:
+    ads_spend: 625711
+    impressions: 1019
+    reach: 812
+    messages: 9
+    cpm: 614044
+    msg_rate_pct: 1.11
+    campaigns: 1
+    campaign_types:
+    - '5'
+    evaluation: AVERAGE
+    by_marketer:
+      Mạnh:
+        spend: 625711
+        campaigns: 1
+        impressions: 1019
+        reach: 812
+        messages: 9
+        cpm: 614044
+        msg_rate_pct: 1.11
+  Tẩy rửa:
+    ads_spend: 611870
+    impressions: 885
+    reach: 826
+    messages: 11
+    cpm: 691379
+    msg_rate_pct: 1.33
+    campaigns: 1
+    campaign_types:
+    - '0601'
+    evaluation: AVERAGE
+    by_marketer:
+      Thành:
+        spend: 611870
+        campaigns: 1
+        impressions: 885
+        reach: 826
+        messages: 11
+        cpm: 691379
+        msg_rate_pct: 1.33
+  QUẦN ĐỊNH HÌNH:
+    ads_spend: 406472
+    impressions: 674
+    reach: 531
+    messages: 10
+    cpm: 603074
+    msg_rate_pct: 1.88
+    campaigns: 1
+    campaign_types:
+    - '24.1'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Mạnh:
+        spend: 406472
+        campaigns: 1
+        impressions: 674
+        reach: 531
+        messages: 10
+        cpm: 603074
+        msg_rate_pct: 1.88
+  kem boi da:
+    ads_spend: 317917
+    impressions: 487
+    reach: 390
+    messages: 4
+    cpm: 652807
+    msg_rate_pct: 1.03
+    campaigns: 1
+    campaign_types:
+    - '26'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Mạnh:
+        spend: 317917
+        campaigns: 1
+        impressions: 487
+        reach: 390
+        messages: 4
+        cpm: 652807
+        msg_rate_pct: 1.03
+  Face Serum:
+    ads_spend: 242696
+    impressions: 306
+    reach: 270
+    messages: 2
+    cpm: 793124
+    msg_rate_pct: 0.74
+    campaigns: 1
+    campaign_types:
+    - '2512'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Thành:
+        spend: 242696
+        campaigns: 1
+        impressions: 306
+        reach: 270
+        messages: 2
+        cpm: 793124
+        msg_rate_pct: 0.74
+  Kem dưỡng nhan:
+    ads_spend: 208133
+    impressions: 276
+    reach: 226
+    messages: 2
+    cpm: 754105
+    msg_rate_pct: 0.88
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Thành:
+        spend: 208133
+        campaigns: 1
+        impressions: 276
+        reach: 226
+        messages: 2
+        cpm: 754105
+        msg_rate_pct: 0.88
+  Kem đánh răng:
+    ads_spend: 207907
+    impressions: 461
+    reach: 393
+    messages: 3
+    cpm: 450991
+    msg_rate_pct: 0.76
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Thành:
+        spend: 207907
+        campaigns: 1
+        impressions: 461
+        reach: 393
+        messages: 3
+        cpm: 450991
+        msg_rate_pct: 0.76
+  Arlux Hair Remove:
+    ads_spend: 120798
+    impressions: 213
+    reach: 186
+    messages: 0
+    cpm: 567127
+    msg_rate_pct: 0.0
+    campaigns: 1
+    campaign_types:
+    - '0601'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Thành:
+        spend: 120798
+        campaigns: 1
+        impressions: 213
+        reach: 186
+        messages: 0
+        cpm: 567127
+        msg_rate_pct: 0.0
+  Collagen:
+    ads_spend: 74595
+    impressions: 114
+    reach: 103
+    messages: 0
+    cpm: 654342
+    msg_rate_pct: 0.0
+    campaigns: 1
+    campaign_types:
+    - '3112'
+    evaluation: MICRO_TEST
+    by_marketer:
+      Thành:
+        spend: 74595
+        campaigns: 1
+        impressions: 114
+        reach: 103
+        messages: 0
+        cpm: 654342
+        msg_rate_pct: 0.0
+pos_products_without_ads:
+- product_id: da74d219-c7a1-4610-b4b3-cc256bda8ba8
+  name: Unknown (no SKU mapping)
+  orders: 390
+  qty: 1205
+  revenue: 248077500
+  note: No SKU in product_template
+- product_id: 2d0073e2-9ea1-4b20-b842-cbceead93c98
+  name: Unknown (no SKU mapping)
+  orders: 300
+  qty: 637
+  revenue: 235771800
+  note: No SKU in product_template
+- product_id: 1cc65606-3f8b-4260-aff5-0b74ee545ca8
+  name: Unknown (no SKU mapping)
+  orders: 70
+  qty: 208
+  revenue: 40573500
+  note: No SKU in product_template
+- product_id: 3f74df8a-66bf-4773-ab77-19ae8dad6518
+  name: Unknown (no SKU mapping)
+  orders: 166
+  qty: 188
+  revenue: 74170200
+  note: No SKU in product_template
+- product_id: 46375905-cc30-4a03-bcf1-fea8ddd83af2
+  name: Unknown (no SKU mapping)
+  orders: 133
+  qty: 149
+  revenue: 140656100
+  note: No SKU in product_template
+- sku: 089
+  name: 089 - Natural Black Floral Hair Dye
+  orders: 36
+  qty: 118
+  revenue: 27852000
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: f30692bf-7e85-4ed7-a509-f07290b211d9
+  name: Unknown (no SKU mapping)
+  orders: 35
+  qty: 95
+  revenue: 26383500
+  note: No SKU in product_template
+- sku: TEST
+  name: SP TEST
+  orders: 40
+  qty: 93
+  revenue: 4917000
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: 090
+  name: 090 - Chestnut Brown Floral Hair Dye
+  orders: 24
+  qty: 71
+  revenue: 20905500
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: f78d975b-61a5-4e37-b305-569e97a4ba5b
+  name: Unknown (no SKU mapping)
+  orders: 19
+  qty: 57
+  revenue: 10659000
+  note: No SKU in product_template
+- product_id: 3941cc28-4a59-46e0-8d0e-fcf4130ccbd8
+  name: Unknown (no SKU mapping)
+  orders: 18
+  qty: 54
+  revenue: 5114300
+  note: No SKU in product_template
+- product_id: 2ca5d583-8114-4b24-b394-ca1b89d00365
+  name: Unknown (no SKU mapping)
+  orders: 21
+  qty: 41
+  revenue: 7658600
+  note: No SKU in product_template
+- product_id: c7cf2cd1-a202-4da7-a40c-8776785a3207
+  name: Unknown (no SKU mapping)
+  orders: 15
+  qty: 37
+  revenue: 0
+  note: No SKU in product_template
+- product_id: 458da40d-900a-4104-99b6-bfb7ceea7d05
+  name: Unknown (no SKU mapping)
+  orders: 22
+  qty: 31
+  revenue: 12144000
+  note: No SKU in product_template
+- sku: '104'
+  name: 104 - BLUE STONE WATCH – BRACELET
+  orders: 17
+  qty: 23
+  revenue: 7375500
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: ae94701b-e5de-41b8-8a01-f9a4c7653712
+  name: Unknown (no SKU mapping)
+  orders: 17
+  qty: 22
+  revenue: 7658600
+  note: No SKU in product_template
+- product_id: 01baf675-3559-483d-a78a-814b8d05b720
+  name: Unknown (no SKU mapping)
+  orders: 16
+  qty: 20
+  revenue: 7658600
+  note: No SKU in product_template
+- sku: 038
+  name: 038 - Green Bra M
+  orders: 5
+  qty: 17
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: 8589cc61-2877-4636-a390-8d870ad27824
+  name: Unknown (no SKU mapping)
+  orders: 7
+  qty: 12
+  revenue: 0
+  note: No SKU in product_template
+- sku: 028
+  name: 028 - Black Bra M
+  orders: 5
+  qty: 10
+  revenue: 2458500
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '034'
+  name: 034 - Beige Bra L
+  orders: 4
+  qty: 10
+  revenue: 2458500
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '036'
+  name: 036 - Beige Bra 2XL
+  orders: 4
+  qty: 10
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '031'
+  name: 031 - Black Bra 2XL
+  orders: 4
+  qty: 10
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '041'
+  name: 041 - Green Bra 2XL
+  orders: 4
+  qty: 8
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '033'
+  name: 033 - Beige Bra M
+  orders: 3
+  qty: 8
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: TX
+  name: TX Cream
+  orders: 1
+  qty: 7
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '345'
+  name: 345 Cream
+  orders: 1
+  qty: 5
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: 039
+  name: 039 - Green Bra L
+  orders: 2
+  qty: 4
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: 029
+  name: 029 - Black Bra L
+  orders: 2
+  qty: 4
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: 4b24116e-afdc-42af-9d46-fead0bd1bf86
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 4
+  revenue: 0
+  note: No SKU in product_template
+- product_id: db21860f-a16f-4a3b-a50e-547e8271440d
+  name: Unknown (no SKU mapping)
+  orders: 2
+  qty: 3
+  revenue: 0
+  note: No SKU in product_template
+- product_id: fb86bb96-f1f7-45c6-b0e5-41cc2c1c1831
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 3
+  revenue: 3829300
+  note: No SKU in product_template
+- product_id: 8fc2fa89-da51-4943-b623-26b12726f3e0
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 3
+  revenue: 0
+  note: No SKU in product_template
+- sku: '035'
+  name: 035 - Beige Bra XL
+  orders: 2
+  qty: 3
+  revenue: 1798500
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '037'
+  name: 037 - Beige Bra 3XL
+  orders: 1
+  qty: 3
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: c23eb52b-4fbc-43a4-9759-3a539e38d303
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 3
+  revenue: 0
+  note: No SKU in product_template
+- sku: '032'
+  name: 032 - Black Bra 3XL
+  orders: 1
+  qty: 3
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: e29408eb-5bf2-45c2-9bc7-5871b72e552d
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 3
+  revenue: 0
+  note: No SKU in product_template
+- product_id: 8e6cc2ea-25ac-43e3-9071-bf65b91b6120
+  name: Unknown (no SKU mapping)
+  orders: 2
+  qty: 2
+  revenue: 5114300
+  note: No SKU in product_template
+- sku: '042'
+  name: 042 - Green Bra 3XL
+  orders: 1
+  qty: 2
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- sku: '030'
+  name: 030 - Black Bra XL
+  orders: 1
+  qty: 2
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected
+- product_id: 73a7cdee-8a72-42d6-8642-23dbdc4846f6
+  name: Unknown (no SKU mapping)
+  orders: 1
+  qty: 2
+  revenue: 0
+  note: No SKU in product_template
+- sku: '040'
+  name: 040 - Green Bra XL
+  orders: 1
+  qty: 1
+  revenue: 0
+  note: Sold on POS but no Meta Ads campaigns detected

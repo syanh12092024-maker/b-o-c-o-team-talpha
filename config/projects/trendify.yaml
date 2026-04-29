@@ -1,0 +1,114 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  TRENDIFY (SRN/Sorina) — Project Configuration       ║
+# ║  E-commerce cross-border — Romania/EU                 ║
+# ║  Updated: 2026-03-10 (Phase 0 — Architecture Design) ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: TRENDIFY
+project_name: "Trendify"
+description: "E-commerce cross-border Romania & EU (alias: SRN/Sorina)"
+currency: USD
+timezone: Asia/Ho_Chi_Minh
+status: active
+
+# ─── 2. BIGQUERY ───
+bigquery:
+  project_gcp: "levelup-465304"
+  dataset: "TRENDIFY_Dataset"
+
+# ─── 3. FACEBOOK ADS ───
+meta_ads:
+  app_id: ""
+  app_secret: ""
+  access_token: ""                       # Từ n8n: EAAltaPCjgRABQ... (SRN token)
+  ad_account_ids:
+    - "act_2025588411315168"             # TDF_RO_01
+    - "act_4420197331549301"             # TDF_RO(Dufei)_03
+  business_id: ""
+  pixel_id: ""
+
+# ─── 4. POS / ORDER MANAGEMENT ───
+pos_system: poscake
+
+poscake:
+  shops:
+    - name: "US"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${TRENDIFY_POSCAKE_API_KEY}"          # ⚠️ Actual value in .env
+      shop_id: "407220179"
+    - name: "RO"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "${TRENDIFY_POSCAKE_API_KEY}"          # ⚠️ Actual value in .env
+      shop_id: "407925623"
+  shop_ids:
+    - "407220179"
+    - "407925623"
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: ""                        # TODO: Boss cung cấp
+  api_url: ""
+  api_key: ""
+  api_secret: ""
+  tracking_enabled: false
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: RO
+    name: "Romania"
+    currency: RON
+    warehouse: "Romania Warehouse"
+  - code: US
+    name: "United States"
+    currency: USD
+    warehouse: ""
+  - code: HR
+    name: "Croatia"
+    currency: EUR
+    warehouse: ""
+  - code: IT
+    name: "Italy"
+    currency: EUR
+    warehouse: ""
+  - code: BG
+    name: "Bulgaria"
+    currency: BGN
+    warehouse: ""
+
+# ─── 7. DISCORD NOTIFICATIONS ───
+discord:
+  webhook_report: "https://discord.com/api/webhooks/1455379087785725992/oTPrz"       # Từ n8n scan
+  webhook_alert: ""
+  webhook_etl: ""
+
+# ─── 8. GOOGLE SHEETS ───
+google_sheets:
+  product_cost_sheet_id: ""
+  fixed_cost_sheet_id: ""
+  order_sheet_id: ""
+  combo_sheet_id: "190GT-95O0z1tMydopvOw4K2txglxII8j4Wx6We7K-Bg"    # SRN-Quản lý CT bán Sorina
+
+# ─── 9. TEAM ───
+marketers:
+  - id: "VANPTT"
+    name: "Vân PTT"
+    role: "Marketer"
+  - id: "THUDM"
+    name: "Thu DM"
+    role: "Marketer"
+  - id: "PHUNGNTM"
+    name: "Phụng NTM"
+    role: "Marketer"
+  - id: "TuPA"
+    name: "Tú PA"
+    role: "Marketer"
+
+# ─── 10. GHI CHÚ ───
+notes: |
+  - Alias trong n8n: SRN (prefix: SRN-)
+  - 2 shops Poscake: US (407220179) + RO (407925623)
+  - Shop 407925623 trước đây bị map sai vào STRAMARK trong BQ
+  - BigQuery dataset: TRENDIFY_Dataset (MỚI)
+  - Zen8_Dataset cũ = READ-ONLY reference
+  - 2 tài khoản quảng cáo

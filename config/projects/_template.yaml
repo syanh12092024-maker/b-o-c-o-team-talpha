@@ -1,0 +1,72 @@
+# ╔══════════════════════════════════════════════════════╗
+# ║  PROJECT TEMPLATE — Copy & fill for new projects     ║
+# ║  cp config/projects/_template.yaml config/projects/  ║
+# ║  {project_id}.yaml                                   ║
+# ╚══════════════════════════════════════════════════════╝
+
+# ─── 1. THÔNG TIN DỰ ÁN ───
+project_id: ""                          # REQUIRED: mã dự án (lowercase, vd: zen8, pialpha)
+project_name: ""                        # REQUIRED: tên hiển thị
+description: ""                         # Mô tả ngắn
+currency: USD                           # Đơn vị tiền chính
+timezone: Asia/Ho_Chi_Minh
+status: active                          # active / paused / archived
+
+# ─── 2. FACEBOOK ADS ───
+meta_ads:
+  access_token: ""                      # System User Access Token
+  ad_account_ids:
+    - "act_XXXXXXXXXX"                  # Tài khoản quảng cáo #1
+  business_id: ""
+  pixel_id: ""
+
+# ─── 3. POS (Poscake) ───
+poscake:
+  api_url: "https://pos.pages.fm/api/v1"
+  api_token: ""                         # POS → Cài đặt → API → Copy token
+  shop_ids:                             # Danh sách shop_id trên POS
+    - ""
+
+# ─── 4. PANCAKE CRM ───
+pancake:
+  api_url: "https://pages.fm/api/v1"
+  api_token: ""
+  page_ids:
+    - ""
+
+# ─── 5. FULFILLMENT (3PL) ───
+fulfillment:
+  primary_3pl: ""                       # ajex / jnt / aramex / spx
+  carriers:
+    - name: ""
+      api_url: ""
+      api_key: ""
+
+# ─── 6. THỊ TRƯỜNG ───
+markets:
+  - code: ""                            # Mã 2-3 ký tự (SA, AE, US...)
+    name: ""                            # Tên đầy đủ
+    currency: ""                        # Đơn vị tiền thị trường
+    warehouse: ""                       # Kho phục vụ
+
+# ─── 7. DISCORD ───
+discord:
+  webhook_report: ""                    # Webhook cho báo cáo daily
+  webhook_alert: ""                     # Webhook cho alert (có thể khác channel)
+
+# ─── 8. BIGQUERY ───
+bigquery:
+  dataset: "Zen8_Dataset"              # Shared dataset (không đổi)
+  project_gcp: "levelup-465304"        # GCP project ID
+
+# ─── 9. TEAM ───
+marketers:
+  - code: ""                            # Mã MKT 3 ký tự
+    name: ""                            # Tên đầy đủ
+cs_staff:
+  - code: ""
+    name: ""
+
+# ─── 10. GHI CHÚ ───
+notes: |
+  -

@@ -1,0 +1,5 @@
+# Ignore secrets
+*.json
+*.key
+*.pem
+.env
