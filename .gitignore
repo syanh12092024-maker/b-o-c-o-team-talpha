@@ -87,3 +87,11 @@ config/manual_data/
 .auto-memory/*.md
 !.auto-memory/INDEX.md.codenexus/
 .worktrees
+
+# Secrets
+dashboard-ui/config/bigquery-key.json
+dashboard-ui/config_talpha/bigquery-key.json
+config/bigquery-key.json
+*.json.bak
+dashboard-ui/config/projects/talpha.yaml
+dashboard-ui/config_talpha/

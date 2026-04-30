@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import {
     Megaphone, Package, DollarSign,
     Users, Brain, Globe, Target,
-    ArrowLeft
+    ArrowLeft, Search, Send, Truck,
+    Settings, HelpCircle, FileText, ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { subDays } from "date-fns";
@@ -21,13 +22,18 @@ import TALPHACustomerTab from "./tabs/customer-tab";
 import TALPHAMarketIntelTab from "./tabs/market-intel-tab";
 
 const TAB_ITEMS = [
-    { id: "ceo", label: "CEO Intelligence", icon: Brain },
-    { id: "ads-command", label: "Ads Command Center", icon: Target },
-    { id: "marketing", label: "Marketing & Ads", icon: Megaphone },
+    { id: "ceo", label: "Tổng quan CEO", icon: Brain },
+    { id: "ads-command", label: "Trung tâm Quảng cáo", icon: Target },
+    { id: "marketing", label: "Marketing & QC", icon: Megaphone },
     { id: "products", label: "Sản phẩm & Kho", icon: Package },
-    { id: "pnl", label: "P&L", icon: DollarSign },
+    { id: "pnl", label: "Lãi / Lỗ", icon: DollarSign },
     { id: "customers", label: "Khách hàng", icon: Users },
-    { id: "market-intel", label: "Market Intel", icon: Globe },
+    { id: "market-intel", label: "Thị trường", icon: Globe },
+    { id: "spy", label: "Tìm SP Spy", icon: Search },
+    { id: "script", label: "Tạo kịch bản", icon: FileText },
+    { id: "flow", label: "Đặt và flow hàng", icon: ShoppingBag },
+    { id: "broadcast", label: "Gửi tin hàng loạt", icon: Send },
+    { id: "shipping", label: "Vận đơn", icon: Truck },
 ];
 
 export default function TALPHADashboardShell() {
