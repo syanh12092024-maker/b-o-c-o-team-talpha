@@ -20,27 +20,48 @@ interface RealtimeData {
 }
 
 const ACCOUNT_NAMES: Record<string, string> = {
-    // Sỹ Lộc
-    "act_855567553811483": "Sỹ Lộc 01", "act_934116652330312": "Sỹ Lộc 02",
-    "act_1284981146939856": "Sỹ Lộc 03", "act_1614386202936215": "Sỹ Lộc 04",
-    // Chu Thuý
-    "act_833593695771745": "Chu Thuý 01", "act_848995974322757": "Chu Thuý 02",
-    "act_1461543545434816": "Chu Thuý 03", "act_1437142241537275": "Chu Thuý 04",
-    // Nhung
-    "act_1223948656596727": "Nhung LevelUp - 01", "act_1670686890508970": "Nhung 02",
+    // ── Sỹ Lộc (4 TK) ──
+    "act_855567553811483": "Sỹ Lộc 01",
+    "act_934116652330312": "Sỹ Lộc 02",
+    "act_1284981146939856": "Sỹ Lộc 03",
+    "act_1614386202936215": "Sỹ Lộc 04",
+    // ── Chu Thuý (4 TK) ──
+    "act_833593695771745": "Chu Thuý 01",
+    "act_848995974322757": "Chu Thuý 02",
+    "act_1461543545434816": "Chu Thuý 03",
+    "act_1437142241537275": "Chu Thuý 04",
+    // ── Nhung (6 TK) ──
+    "act_1223948656596727": "Nhung LevelUp - 01",
+    "act_1670686890508970": "Nhung 02",
     "act_923574177322682": "Nhung 03",
-    // N.Thế
-    "act_1670240591020196": "N.Thế 01", "act_946287684758283": "N.Thế 02",
-    "act_916423977810241": "N.Thế 03", "act_26411407608471378": "N.Thế 04",
+    "act_2710483295993252": "Nhung 04",
+    "act_25706199102388719": "Nhung 05",
+    "act_1272638375040037": "Nhung 06",
+    // ── N.Thế (5 TK) ──
+    "act_1670240591020196": "N.Thế 01",
+    "act_946287684758283": "N.Thế 02",
+    "act_916423977810241": "N.Thế 03",
+    "act_26411407608471378": "N.Thế 04",
     "act_1653063986109325": "N.Thế 05",
-    // Mạnh
-    "act_1660923908668482": "Mạnh 01", "act_937483619152247": "Mạnh 02",
-    // Mai
-    "act_3534017756739334": "Kuwait +3", "act_703242242813144": "Trang Sức +1",
-    // S.ANH
-    "act_962218859667133": "S.ANH - 01 - ĐÔNG Á", "act_939548861921691": "S.ANH - 02 - ĐÔNG Á",
+    // ── Mạnh (2 TK) ──
+    "act_1660923908668482": "Mạnh 01",
+    "act_937483619152247": "Mạnh 02",
+    // ── Mai (2 TK) ──
+    "act_869269479518459": "Mai 01",
+    "act_4206311709698762": "Mai 02",
+    // ── Sỹ Anh (3 TK) ──
+    "act_962218859667133": "S.ANH - 01 - ĐÔNG Á",
+    "act_939548861921691": "S.ANH - 02 - ĐÔNG Á",
+    "act_2049977905930743": "Sỹ Anh 03",
+    // ── Trang Sức & Đặc biệt (6 TK) ──
+    "act_3534017756739334": "Kuwait +3",
+    "act_703242242813144": "Trang Sức +1",
+    "act_4382396978703883": "Trang sức 27/04/2026",
+    "act_416558701342048": "Tiểu Alpha 1",
     "act_1249019484033894": "Sỹ Anh 02",
     "act_1670165974333671": "Nhật Bản - 03",
+    "act_1420244962877096": "TK ĐÀi",
+    "act_976131321619273": "TK ĐKY Page",
 };
 const getAccountName = (id: string) => ACCOUNT_NAMES[id] || id;
 
@@ -418,544 +439,214 @@ export default function TALPHAAdsCommandTab() {
         );
     }
 
+    const fmtN = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
+
     return (
-        <div className="h-full flex flex-col gap-2 w-full overflow-hidden">
-            {/* ═══ HEADER ═══ */}
-            <header className="flex-shrink-0 flex items-center justify-between bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-100">
-
-                <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-500"><Satellite className="w-3.5 h-3.5" /></div>
-                    <div>
-                        <h1 className="text-xs font-bold text-slate-800 uppercase tracking-tight">Ads Command Center</h1>
-                        <p className="text-[8px] text-slate-400 flex items-center gap-1">
-                            <Sparkles className="w-2 h-2 text-amber-500" /> V5.2 — Meta Ads + POS Real-time
-                        </p>
+        <div className="space-y-5 animate-fade-in">
+            {/* HEADER */}
+            <div className="flex items-start justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-foreground tracking-tight">TRUNG TÂM QUẢNG CÁO</h2>
+                    <p className="text-sm text-muted-foreground mt-0.5">Quản lý và tối ưu hóa hiệu suất chiến dịch quảng cáo toàn diện</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 bg-white dark:bg-card border border-border rounded-lg px-3 py-2 text-sm text-muted-foreground">
+                        Hôm nay: {new Date().toLocaleDateString("vi-VN")}
                     </div>
-
-                    {/* ── ACCOUNT SELECTOR (LEFT) ── */}
-                    <div className="relative ml-3" ref={accountRef}>
-                        <button onClick={() => setIsAccountOpen(!isAccountOpen)}
-                            className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1.5 text-[10px] text-blue-700 font-semibold hover:border-blue-400 transition max-w-[180px]">
-                            <Layers className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">{selectedAccount === "all" ? `Tất cả (${activeAccountIds.length})` : getAccountName(selectedAccount)}</span>
-                            <ChevronDown className={cn("h-2.5 w-2.5 transition flex-shrink-0", isAccountOpen && "rotate-180")} />
-                        </button>
-                        {isAccountOpen && (
-                            <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden">
-                                <div className="p-2 border-b border-slate-100">
-                                    <input type="text" value={accountSearch} onChange={(e) => setAccountSearch(e.target.value)}
-                                        placeholder="Tìm tài khoản..." autoFocus
-                                        className="w-full px-2.5 py-1.5 text-[10px] border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 bg-slate-50" />
-                                </div>
-                                <div className="max-h-[300px] overflow-y-auto">
-                                    <button onClick={() => { setSelectedAccount("all"); setIsAccountOpen(false); setAccountSearch(""); }}
-                                        className={cn("w-full flex items-center justify-between px-3 py-2 text-[10px] hover:bg-blue-50 transition border-b border-slate-50",
-                                            selectedAccount === "all" ? "bg-blue-50 text-blue-700" : "text-slate-600")}>
-                                        <span className="font-semibold">🌐 Tất cả ({accountIds.length} TKQC)</span>
-                                        {selectedAccount === "all" && <Check className="h-3 w-3 text-blue-500" />}
-                                    </button>
-                                    {filteredAccountIds.map(accId => (
-                                        <button key={accId} onClick={() => { setSelectedAccount(accId); setIsAccountOpen(false); setAccountSearch(""); }}
-                                            className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-blue-50 transition",
-                                                selectedAccount === accId ? "bg-blue-50 text-blue-700" : "text-slate-600")}>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className={cn("w-1.5 h-1.5 rounded-full", activeAccountIds.includes(accId) ? "bg-blue-500" : "bg-slate-300")} />
-                                                <span className="font-medium">{getAccountName(accId)}</span>
-                                            </div>
-                                            {selectedAccount === accId && <Check className="h-3 w-3 text-blue-500" />}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {/* ── DATE RANGE PICKER ── */}
-                    <div className="relative" ref={dateRef}>
-                        <button onClick={() => setIsDateOpen(!isDateOpen)}
-                            className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10px] text-slate-700 font-semibold hover:border-slate-400 transition">
-                            <Calendar className="h-3 w-3 text-slate-500" />
-                            <span>{dateLabel}</span>
-                            <ChevronDown className={cn("h-2.5 w-2.5 transition", isDateOpen && "rotate-180")} />
-                        </button>
-                        {isDateOpen && (
-                            <div className="absolute top-full right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 flex" style={{ width: "580px" }}>
-                                {/* Presets */}
-                                <div className="w-[150px] border-r border-slate-100 py-2 flex-shrink-0">
-                                    <p className="px-3 py-1 text-[8px] text-slate-400 uppercase font-bold tracking-wider">Khoảng thời gian</p>
-                                    {DATE_PRESETS.map(p => (
-                                        <button key={p.key} onClick={() => {
-                                            const [f, t] = getDatePreset(p.key);
-                                            setFromDate(f); setToDate(t); setDateLabel(p.label); setIsDateOpen(false);
-                                        }}
-                                            className={cn("w-full text-left px-3 py-1.5 text-[10px] hover:bg-blue-50 transition",
-                                                dateLabel === p.label ? "bg-blue-50 text-blue-700 font-semibold" : "text-slate-600")}>
-                                            {p.label}
-                                        </button>
-                                    ))}
-                                </div>
-                                {/* Calendar */}
-                                <div className="flex-1 p-3">
-                                    <div className="flex gap-4">
-                                        {/* Month 1 */}
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <button onClick={() => setCalendarMonth(m => m.month === 0 ? { year: m.year - 1, month: 11 } : { ...m, month: m.month - 1 })}
-                                                    className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-700 text-xs">‹</button>
-                                                <span className="text-[10px] font-bold text-slate-700">{MONTHS_VN[calendarMonth.month]} {calendarMonth.year}</span>
-                                                <div className="w-5" />
-                                            </div>
-                                            <div className="grid grid-cols-7 gap-0.5">
-                                                {WEEKDAYS.map(w => <div key={w} className="text-center text-[8px] text-slate-400 font-bold py-1">{w}</div>)}
-                                                {renderCalendar(calendarMonth.year, calendarMonth.month)}
-                                            </div>
-                                        </div>
-                                        {/* Month 2 */}
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="w-5" />
-                                                <span className="text-[10px] font-bold text-slate-700">{MONTHS_VN[nextMonth.month]} {nextMonth.year}</span>
-                                                <button onClick={() => setCalendarMonth(m => m.month === 11 ? { year: m.year + 1, month: 0 } : { ...m, month: m.month + 1 })}
-                                                    className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-700 text-xs">›</button>
-                                            </div>
-                                            <div className="grid grid-cols-7 gap-0.5">
-                                                {WEEKDAYS.map(w => <div key={`n${w}`} className="text-center text-[8px] text-slate-400 font-bold py-1">{w}</div>)}
-                                                {renderCalendar(nextMonth.year, nextMonth.month)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Selected range display */}
-                                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
-                                        <div className="flex items-center gap-2 text-[10px]">
-                                            <span className="px-2 py-1 bg-blue-50 border border-blue-200 rounded text-blue-700 font-mono">{formatDateVN(fromDate)}</span>
-                                            <span className="text-slate-400">→</span>
-                                            <span className="px-2 py-1 bg-blue-50 border border-blue-200 rounded text-blue-700 font-mono">{formatDateVN(toDate)}</span>
-                                        </div>
-                                        <button onClick={() => setIsDateOpen(false)}
-                                            className="px-3 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition">
-                                            Áp dụng
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <label className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-lg border border-slate-200 cursor-pointer">
-                        <input type="checkbox" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} className="accent-blue-500 w-3 h-3" />
-                        <span className="text-[10px] text-slate-500">60s</span>
-                        {autoRefresh && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
-                    </label>
-                    <button onClick={fetchData} disabled={loading}
-                        className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 transition">
-                        <RotateCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
-                    </button>
-                    <button onClick={syncToSheet} disabled={syncing || !data}
-                        className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white rounded-lg px-2.5 py-1.5 text-[10px] font-bold transition disabled:opacity-50">
-                        {syncing ? <RotateCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-                        Sheet
+                    <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20">
+                        + Tạo chiến dịch
                     </button>
                 </div>
-            </header>
-
-            {/* ═══ FILTER PILL BAR ═══ */}
-            <div className="flex-shrink-0 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 flex-wrap">
-
-                {/* ── Country Filter ── */}
-                <div className="relative" ref={countryRef}>
-                    <button onClick={() => setIsCountryOpen(!isCountryOpen)}
-                        className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition border",
-                            selectedCountry !== "all" ? "bg-amber-100 border-amber-300 text-amber-800" : "bg-amber-50 border-amber-200 text-amber-600 hover:border-amber-400")}>
-                        <Globe className="h-3 w-3" />
-                        <span>{selectedCountry === "all" ? "Quốc gia" : selectedCountry}</span>
-                        <ChevronDown className={cn("h-2.5 w-2.5 transition", isCountryOpen && "rotate-180")} />
-                    </button>
-                    {isCountryOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-[300px] overflow-y-auto">
-                            <button onClick={() => { setSelectedCountry("all"); setIsCountryOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-amber-50 transition border-b border-slate-50",
-                                    selectedCountry === "all" ? "bg-amber-50 text-amber-700" : "text-slate-600")}>
-                                <span className="font-semibold">🌍 Tất cả QG</span>
-                                {selectedCountry === "all" && <Check className="h-3 w-3 text-amber-500" />}
-                            </button>
-                            {filterOptions.countries.map(c => (
-                                <button key={c} onClick={() => { setSelectedCountry(c); setIsCountryOpen(false); }}
-                                    className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-amber-50 transition",
-                                        selectedCountry === c ? "bg-amber-50 text-amber-700" : "text-slate-600")}>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                                        <span className="font-medium">{c}</span>
-                                        <span className="text-[8px] text-slate-400">({filterOptions.countryCounts[c] || 0})</span>
-                                    </div>
-                                    {selectedCountry === c && <Check className="h-3 w-3 text-amber-500" />}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* ── MKT Filter ── */}
-                <div className="relative" ref={marketerRef}>
-                    <button onClick={() => setIsMarketerOpen(!isMarketerOpen)}
-                        className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition border",
-                            selectedMarketer !== "all" ? "bg-emerald-100 border-emerald-300 text-emerald-800" : "bg-emerald-50 border-emerald-200 text-emerald-600 hover:border-emerald-400")}>
-                        <Users className="h-3 w-3" />
-                        <span>{selectedMarketer === "all" ? "MKT" : filterOptions.marketers.find(m => m.key === selectedMarketer)?.display || selectedMarketer}</span>
-                        <ChevronDown className={cn("h-2.5 w-2.5 transition", isMarketerOpen && "rotate-180")} />
-                    </button>
-                    {isMarketerOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-[300px] overflow-y-auto">
-                            <button onClick={() => { setSelectedMarketer("all"); setIsMarketerOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-emerald-50 transition border-b border-slate-50",
-                                    selectedMarketer === "all" ? "bg-emerald-50 text-emerald-700" : "text-slate-600")}>
-                                <span className="font-semibold">👥 Tất cả NV</span>
-                                {selectedMarketer === "all" && <Check className="h-3 w-3 text-emerald-500" />}
-                            </button>
-                            {filterOptions.marketers.map(m => (
-                                <button key={m.key} onClick={() => { setSelectedMarketer(m.key); setIsMarketerOpen(false); }}
-                                    className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-emerald-50 transition",
-                                        selectedMarketer === m.key ? "bg-emerald-50 text-emerald-700" : "text-slate-600")}>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                        <span className="font-medium">{m.display}</span>
-                                        <span className="text-[8px] text-slate-400">({m.count})</span>
-                                    </div>
-                                    {selectedMarketer === m.key && <Check className="h-3 w-3 text-emerald-500" />}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* ── Product Filter ── */}
-                <div className="relative" ref={productRef}>
-                    <button onClick={() => setIsProductOpen(!isProductOpen)}
-                        className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition border",
-                            selectedProduct !== "all" ? "bg-purple-100 border-purple-300 text-purple-800" : "bg-purple-50 border-purple-200 text-purple-600 hover:border-purple-400")}>
-                        <Package className="h-3 w-3" />
-                        <span className="truncate max-w-[80px]">{selectedProduct === "all" ? "Sản phẩm" : selectedProduct}</span>
-                        <ChevronDown className={cn("h-2.5 w-2.5 transition", isProductOpen && "rotate-180")} />
-                    </button>
-                    {isProductOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-[300px] overflow-y-auto">
-                            <button onClick={() => { setSelectedProduct("all"); setIsProductOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-purple-50 transition border-b border-slate-50",
-                                    selectedProduct === "all" ? "bg-purple-50 text-purple-700" : "text-slate-600")}>
-                                <span className="font-semibold">📦 Tất cả SP</span>
-                                {selectedProduct === "all" && <Check className="h-3 w-3 text-purple-500" />}
-                            </button>
-                            {filterOptions.products.map(p => (
-                                <button key={p} onClick={() => { setSelectedProduct(p); setIsProductOpen(false); }}
-                                    className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-purple-50 transition",
-                                        selectedProduct === p ? "bg-purple-50 text-purple-700" : "text-slate-600")}>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                                        <span className="font-medium">{p}</span>
-                                        <span className="text-[8px] text-slate-400">({filterOptions.productCounts[p] || 0})</span>
-                                    </div>
-                                    {selectedProduct === p && <Check className="h-3 w-3 text-purple-500" />}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* ── Page Filter ── */}
-                <div className="relative" ref={pageRef}>
-                    <button onClick={() => setIsPageOpen(!isPageOpen)}
-                        className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition border",
-                            selectedPage !== "all" ? "bg-sky-100 border-sky-300 text-sky-800" : "bg-sky-50 border-sky-200 text-sky-600 hover:border-sky-400")}>
-                        <FileText className="h-3 w-3" />
-                        <span className="truncate max-w-[100px]">{selectedPage === "all" ? "Page" : selectedPage}</span>
-                        <ChevronDown className={cn("h-2.5 w-2.5 transition", isPageOpen && "rotate-180")} />
-                    </button>
-                    {isPageOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 max-h-[300px] overflow-y-auto">
-                            <button onClick={() => { setSelectedPage("all"); setIsPageOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-sky-50 transition border-b border-slate-50",
-                                    selectedPage === "all" ? "bg-sky-50 text-sky-700" : "text-slate-600")}>
-                                <span className="font-semibold">📱 Tất cả Page</span>
-                                {selectedPage === "all" && <Check className="h-3 w-3 text-sky-500" />}
-                            </button>
-                            {filterOptions.pages.map(pg => (
-                                <button key={pg} onClick={() => { setSelectedPage(pg); setIsPageOpen(false); }}
-                                    className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-sky-50 transition",
-                                        selectedPage === pg ? "bg-sky-50 text-sky-700" : "text-slate-600")}>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                                        <span className="font-medium truncate max-w-[160px]">{pg}</span>
-                                        <span className="text-[8px] text-slate-400">({filterOptions.pageCounts[pg] || 0})</span>
-                                    </div>
-                                    {selectedPage === pg && <Check className="h-3 w-3 text-sky-500" />}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* ── Test Filter ── */}
-                <div className="relative" ref={testRef}>
-                    <button onClick={() => setIsTestOpen(!isTestOpen)}
-                        className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold transition border",
-                            selectedTestStatus !== "all" ? "bg-orange-100 border-orange-300 text-orange-800" : "bg-orange-50 border-orange-200 text-orange-600 hover:border-orange-400")}>
-                        <FlaskConical className="h-3 w-3" />
-                        <span>{selectedTestStatus === "all" ? "Test" : selectedTestStatus === "test" ? "Test" : "Chạy thật"}</span>
-                        <ChevronDown className={cn("h-2.5 w-2.5 transition", isTestOpen && "rotate-180")} />
-                    </button>
-                    {isTestOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-40 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden">
-                            <button onClick={() => { setSelectedTestStatus("all"); setIsTestOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-orange-50 transition border-b border-slate-50",
-                                    selectedTestStatus === "all" ? "bg-orange-50 text-orange-700" : "text-slate-600")}>
-                                <span className="font-semibold">🔬 Tất cả</span>
-                                {selectedTestStatus === "all" && <Check className="h-3 w-3 text-orange-500" />}
-                            </button>
-                            <button onClick={() => { setSelectedTestStatus("test"); setIsTestOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-orange-50 transition",
-                                    selectedTestStatus === "test" ? "bg-orange-50 text-orange-700" : "text-slate-600")}>
-                                <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-orange-400" /><span className="font-medium">🧪 Test</span></div>
-                                {selectedTestStatus === "test" && <Check className="h-3 w-3 text-orange-500" />}
-                            </button>
-                            <button onClick={() => { setSelectedTestStatus("live"); setIsTestOpen(false); }}
-                                className={cn("w-full flex items-center justify-between px-3 py-1.5 text-[10px] hover:bg-orange-50 transition",
-                                    selectedTestStatus === "live" ? "bg-orange-50 text-orange-700" : "text-slate-600")}>
-                                <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /><span className="font-medium">🚀 Chạy thật</span></div>
-                                {selectedTestStatus === "live" && <Check className="h-3 w-3 text-orange-500" />}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* ── Active filter count + Reset ── */}
-                {hasActiveFilter && (
-                    <button onClick={resetAllFilters}
-                        className="flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition ml-1">
-                        <X className="h-3 w-3" />
-                        Xóa lọc
-                    </button>
-                )}
-
-                <span className="text-[9px] text-slate-400 ml-auto font-mono">{filteredAds.length} / {data?.ads?.length || 0} ads</span>
             </div>
 
-            {/* ── POS Market Breakdown bar ── */}
-            {posBreakdown.length > 0 && (
-                <div className="bg-white rounded-lg border border-slate-100 shadow-sm px-4 py-1.5 flex items-center gap-3">
-                    <span className="text-[8px] text-slate-400 uppercase font-bold tracking-wider whitespace-nowrap">📦 POS theo thị trường</span>
-                    <div className="flex flex-wrap gap-x-4 gap-y-0">
-                        {posBreakdown.map(m => (
-                            <div key={m.name} className="flex items-center gap-1 text-[10px]">
-                                <span className="font-semibold text-slate-600">{m.name}</span>
-                                <span className="text-red-500 font-bold">{m.count}</span>
-                                <span className="text-slate-400">({formatVNDCompact(m.revenue)})</span>
-                            </div>
-                        ))}
+            {/* KPI CARDS */}
+            <div className="grid grid-cols-4 gap-4">
+                <div className="kpi-card relative overflow-hidden">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tổng Chi Phí</p>
+                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(Math.round(dFinal.spend))} <span className="text-sm font-normal text-muted-foreground">VNĐ</span></p>
+                </div>
+                <div className="kpi-card relative overflow-hidden">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Đơn Hàng (POS)</p>
+                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(dFinal.pos_orders)} <span className="text-sm font-normal text-muted-foreground">ĐƠN</span></p>
+                </div>
+                <div className="kpi-card relative overflow-hidden border-l-4 border-l-amber-400">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Doanh Thu Dự Kiến</p>
+                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(Math.round(dFinal.pos_revenue))} <span className="text-sm font-normal text-muted-foreground">VNĐ</span></p>
+                </div>
+                <div className="kpi-card relative overflow-hidden">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chỉ Số ROAS</p>
+                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{dFinal.pos_roas > 0 ? dFinal.pos_roas.toFixed(2) : "—"} <span className="text-sm font-normal text-muted-foreground">x</span></p>
+                </div>
+            </div>
+
+            {/* TABLE SECTION */}
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">ADS COMMAND CENTER</h3>
+                        <span className="bg-slate-100 dark:bg-white/10 text-muted-foreground text-xs font-semibold px-2.5 py-0.5 rounded-md">Tất cả ({groupedCampaigns.length})</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={syncToSheet} disabled={syncing || !data} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50">
+                            <Save className="h-3.5 w-3.5" /> Sheet
+                        </button>
+                        <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50">
+                            <RotateCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+                        </button>
                     </div>
                 </div>
-            )}
 
-            {/* ═══ CAMPAIGN TABLE ═══ */}
-            <section className="bg-white rounded-xl shadow-sm border border-slate-100 flex-1 min-h-0 flex flex-col overflow-hidden">
-                <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
-                    <h2 className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                        <Activity className="w-3.5 h-3.5 text-blue-500" /> Chi tiết theo chiến dịch
-                        {selectedAccount !== "all" && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[9px] font-bold border border-blue-200">
-                                {getAccountName(selectedAccount)}
-                            </span>
-                        )}
-                    </h2>
-                    <span className="text-[9px] text-slate-400 font-mono">{groupedCampaigns.length} chiến dịch</span>
+                {/* FILTERS */}
+                <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-gray-50/50 dark:bg-white/[0.02] flex-wrap">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-semibold text-muted-foreground uppercase">Quốc gia</label>
+                        <div className="relative" ref={countryRef}>
+                            <button onClick={() => setIsCountryOpen(!isCountryOpen)} className={cn("flex items-center gap-1.5 text-sm bg-white dark:bg-card border border-border rounded-lg px-3 py-1.5 min-w-[100px]", selectedCountry !== "all" ? "border-amber-400 text-amber-700" : "text-foreground")}>
+                                <Globe className="h-3 w-3" /> {selectedCountry === "all" ? "Tất cả" : selectedCountry} <ChevronDown className="h-3 w-3 ml-auto" />
+                            </button>
+                            {isCountryOpen && (
+                                <div className="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-card border border-border rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
+                                    <button onClick={() => { setSelectedCountry("all"); setIsCountryOpen(false); }} className={cn("w-full text-left px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedCountry === "all" && "bg-blue-50 dark:bg-white/10 font-bold")}>🌍 Tất cả</button>
+                                    {filterOptions.countries.map(c => (<button key={c} onClick={() => { setSelectedCountry(c); setIsCountryOpen(false); }} className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedCountry === c && "bg-blue-50 dark:bg-white/10 font-bold")}>{c} ({filterOptions.countryCounts[c]})</button>))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-semibold text-muted-foreground uppercase">MKT</label>
+                        <div className="relative" ref={marketerRef}>
+                            <button onClick={() => setIsMarketerOpen(!isMarketerOpen)} className={cn("flex items-center gap-1.5 text-sm bg-white dark:bg-card border border-border rounded-lg px-3 py-1.5 min-w-[110px]", selectedMarketer !== "all" ? "border-emerald-400 text-emerald-700" : "text-foreground")}>
+                                <Users className="h-3 w-3" /> {selectedMarketer === "all" ? "Chọn MKT" : filterOptions.marketers.find(m => m.key === selectedMarketer)?.display || selectedMarketer} <ChevronDown className="h-3 w-3 ml-auto" />
+                            </button>
+                            {isMarketerOpen && (
+                                <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-card border border-border rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
+                                    <button onClick={() => { setSelectedMarketer("all"); setIsMarketerOpen(false); }} className={cn("w-full text-left px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedMarketer === "all" && "bg-blue-50 dark:bg-white/10 font-bold")}>👥 Tất cả NV</button>
+                                    {filterOptions.marketers.map(m => (<button key={m.key} onClick={() => { setSelectedMarketer(m.key); setIsMarketerOpen(false); }} className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedMarketer === m.key && "bg-blue-50 dark:bg-white/10 font-bold")}>{m.display} ({m.count})</button>))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-semibold text-muted-foreground uppercase">Sản phẩm</label>
+                        <div className="relative" ref={productRef}>
+                            <button onClick={() => setIsProductOpen(!isProductOpen)} className={cn("flex items-center gap-1.5 text-sm bg-white dark:bg-card border border-border rounded-lg px-3 py-1.5 min-w-[140px]", selectedProduct !== "all" ? "border-purple-400 text-purple-700" : "text-foreground")}>
+                                <Package className="h-3 w-3" /> {selectedProduct === "all" ? "Tất cả sản phẩm" : selectedProduct} <ChevronDown className="h-3 w-3 ml-auto" />
+                            </button>
+                            {isProductOpen && (
+                                <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-card border border-border rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
+                                    <button onClick={() => { setSelectedProduct("all"); setIsProductOpen(false); }} className={cn("w-full text-left px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedProduct === "all" && "bg-blue-50 dark:bg-white/10 font-bold")}>📦 Tất cả SP</button>
+                                    {filterOptions.products.map(p => (<button key={p} onClick={() => { setSelectedProduct(p); setIsProductOpen(false); }} className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedProduct === p && "bg-blue-50 dark:bg-white/10 font-bold")}>{p} ({filterOptions.productCounts[p]})</button>))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-semibold text-muted-foreground uppercase">Trang (Page)</label>
+                        <div className="relative" ref={pageRef}>
+                            <button onClick={() => setIsPageOpen(!isPageOpen)} className={cn("flex items-center gap-1.5 text-sm bg-white dark:bg-card border border-border rounded-lg px-3 py-1.5 min-w-[120px]", selectedPage !== "all" ? "border-sky-400 text-sky-700" : "text-foreground")}>
+                                <FileText className="h-3 w-3" /> {selectedPage === "all" ? "Tất cả trang" : selectedPage} <ChevronDown className="h-3 w-3 ml-auto" />
+                            </button>
+                            {isPageOpen && (
+                                <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-card border border-border rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
+                                    <button onClick={() => { setSelectedPage("all"); setIsPageOpen(false); }} className={cn("w-full text-left px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedPage === "all" && "bg-blue-50 dark:bg-white/10 font-bold")}>📱 Tất cả Page</button>
+                                    {filterOptions.pages.map(pg => (<button key={pg} onClick={() => { setSelectedPage(pg); setIsPageOpen(false); }} className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-blue-50 dark:hover:bg-white/5", selectedPage === pg && "bg-blue-50 dark:bg-white/10 font-bold")}>{pg} ({filterOptions.pageCounts[pg]})</button>))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1 ml-auto">
+                        <label className="text-[10px] font-semibold text-muted-foreground uppercase">Test/Scale</label>
+                        <div className="flex rounded-lg border border-border overflow-hidden bg-white dark:bg-card">
+                            {[{ key: "all", label: "TẤT CẢ" }, { key: "test", label: "TEST" }, { key: "live", label: "SCALE" }].map(t => (
+                                <button key={t.key} onClick={() => setSelectedTestStatus(t.key)}
+                                    className={cn("px-3.5 py-1.5 text-xs font-bold transition-all", selectedTestStatus === t.key ? "bg-slate-800 dark:bg-white/90 text-white dark:text-slate-900" : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-white/10")}>
+                                    {t.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-                <div className="overflow-auto flex-1">
-                    <table className="w-full text-[11px] table-fixed" style={{ minWidth: "1080px" }}>
-                        <colgroup>
-                            <col style={{ width: "20%" }} />
-                            <col style={{ width: "6%" }} />
-                            <col style={{ width: "8%" }} />
-                            <col style={{ width: "6%" }} />
-                            <col style={{ width: "7%" }} />
-                            <col style={{ width: "11%" }} />
-                            <col style={{ width: "6%" }} />
-                            <col style={{ width: "8%" }} />
-                            <col style={{ width: "7%" }} />
-                            <col style={{ width: "7%" }} />
-                            <col style={{ width: "7%" }} />
-                            <col style={{ width: "7%" }} />
-                        </colgroup>
-                        <thead className="sticky top-0 z-10">
-                            {/* ══ GROUP HEADER ══ */}
-                            <tr>
-                                <th rowSpan={2} className="text-left pl-4 pr-2 py-2 text-[9px] font-bold text-slate-500 uppercase bg-slate-50 border-b border-slate-200 border-r border-r-slate-200" style={{ width: "20%" }}>
-                                    Chiến dịch / TKQC
-                                </th>
-                                <th rowSpan={2} className="text-center px-1 py-2 text-[9px] font-bold text-slate-500 uppercase bg-slate-50 border-b border-slate-200 border-r border-r-slate-200" style={{ width: "6%" }}>
-                                    Trạng thái
-                                </th>
-                                {/* META ADS — Blue header */}
-                                <th colSpan={4} className="text-center px-1 py-1.5 text-[9px] font-extrabold text-white uppercase tracking-wide bg-blue-600 border-b border-blue-700" style={{ borderTopLeftRadius: "4px" }}>
-                                    📊 META ADS — QUẢNG CÁO
-                                </th>
-                                {/* POS — Red/Orange header */}
-                                <th colSpan={3} className="text-center px-1 py-1.5 text-[9px] font-extrabold text-white uppercase tracking-wide bg-red-500 border-b border-red-600">
-                                    🛒 POS — ĐƠN HÀNG THỰC
-                                </th>
-                                {/* TƯƠNG TÁC — Slate/Gray header */}
-                                <th colSpan={3} className="text-center px-1 py-1.5 text-[9px] font-extrabold text-white uppercase tracking-wide bg-slate-500 border-b border-slate-600" style={{ borderTopRightRadius: "4px" }}>
-                                    💬 TƯƠNG TÁC & HIỂN THỊ
-                                </th>
-                            </tr>
-                            {/* ══ COLUMN HEADERS ══ */}
-                            <tr className="border-b border-slate-200 text-[8px] uppercase tracking-wider">
-                                {/* Meta Ads sub-columns — light blue bg */}
-                                <th className="text-right px-1.5 py-1.5 font-bold text-blue-700 bg-blue-50">Chi phí</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-blue-700 bg-blue-50">Lượt mua</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-blue-700 bg-blue-50">CP / mua</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-blue-700 bg-blue-50 border-r border-blue-200">GT chuyển đổi</th>
-                                {/* POS sub-columns — light red bg */}
-                                <th className="text-right px-1.5 py-1.5 font-bold text-red-700 bg-red-50">Đơn POS</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-red-700 bg-red-50">DT POS</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-red-700 bg-red-50 border-r border-red-200">ROAS POS</th>
-                                {/* Tương tác sub-columns — light gray bg */}
-                                <th className="text-right px-1.5 py-1.5 font-bold text-slate-600 bg-slate-50">Tin nhắn</th>
-                                <th className="text-right px-1.5 py-1.5 font-bold text-slate-600 bg-slate-50">CP / nhắn</th>
-                                <th className="text-right pr-4 pl-1.5 py-1.5 font-bold text-slate-600 bg-slate-50">Bình luận</th>
+
+                {/* POS breakdown */}
+                {posBreakdown.length > 0 && (
+                    <div className="px-5 py-2 border-b border-border flex items-center gap-3 text-xs flex-wrap">
+                        <span className="text-muted-foreground font-bold uppercase text-[10px]">📦 POS theo thị trường</span>
+                        {posBreakdown.map(m => (<span key={m.name} className="text-muted-foreground"><span className="font-semibold">{m.name}</span> <span className="text-red-500 font-bold">{m.count}</span> <span className="text-muted-foreground/60">({formatVNDCompact(m.revenue)})</span></span>))}
+                    </div>
+                )}
+
+                {/* TABLE */}
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="border-b border-border bg-gray-50/80 dark:bg-white/[0.03]">
+                                <th className="text-left px-5 py-3 text-[11px] font-bold text-muted-foreground uppercase">Chiến dịch / TKQC</th>
+                                <th className="text-center px-3 py-3 text-[11px] font-bold text-muted-foreground uppercase">Trạng thái</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-blue-500 uppercase">Chi phí</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-blue-500 uppercase">Lượt mua</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-blue-500 uppercase">CP/Mua</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-red-500 uppercase">Đơn POS</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-red-500 uppercase">DT POS</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-red-500 uppercase">ROAS POS</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-muted-foreground uppercase">Tin nhắn</th>
+                                <th className="text-right px-3 py-3 text-[11px] font-bold text-muted-foreground uppercase">CP/nhắn</th>
+                                <th className="text-right px-4 py-3 text-[11px] font-bold text-muted-foreground uppercase">Bình luận</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-border/50">
                             {groupedCampaigns.length > 0 ? groupedCampaigns.map((c, idx) => {
-                                const roas = c.spend > 0 ? c.conversion_value / c.spend : 0;
                                 const cpp = c.purchases > 0 ? c.spend / c.purchases : 0;
                                 const cpcMsg = c.messages > 0 ? c.spend / c.messages : 0;
-                                const cpm = c.impressions > 0 ? (c.spend / c.impressions) * 1000 : 0;
-                                const freq = c.reach > 0 ? c.impressions / c.reach : 0;
                                 const posRoas = c.spend > 0 && c.pos_revenue > 0 ? c.pos_revenue / c.spend : 0;
                                 return (
-                                    <tr key={idx} className="group hover:bg-blue-50/30 transition-colors">
-                                        {/* Campaign name */}
-                                        <td className="pl-4 pr-2 py-2 border-r border-slate-100">
-                                            <div className="font-medium text-slate-700 truncate max-w-[240px]" title={c.campaign_name}>{c.campaign_name}</div>
-                                            <div className="text-[9px] text-slate-400">{getAccountName(c.account_id)}</div>
-                                        </td>
-                                        {/* Status */}
-                                        <td className="px-1 py-2 text-center border-r border-slate-100">
-                                            <span className={cn("inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold whitespace-nowrap",
-                                                c.effective_status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                                                c.effective_status === 'PAUSED' ? 'bg-slate-100 text-slate-500 border border-slate-200' :
-
-                                                'bg-red-50 text-red-500 border border-red-200'
-                                            )}>
-                                                <span className={cn("w-1.5 h-1.5 rounded-full",
-                                                    c.effective_status === 'ACTIVE' ? 'bg-emerald-500' :
-                                                    c.effective_status === 'PAUSED' ? 'bg-slate-400' :
-                                                    c.effective_status === 'PAUSED' ? 'bg-slate-400' : 'bg-red-400'
-                                                )} />
-                                                {c.effective_status === 'ACTIVE' ? 'Hoạt động' :
-                                                 c.effective_status === 'PAUSED' ? 'Tạm dừng' :
-                                                 c.effective_status === 'DELETED' ? 'Đã xóa' :
-                                                 c.effective_status === 'ARCHIVED' ? 'Lưu trữ' :
-                                                 c.effective_status === 'ARCHIVED' ? 'Lưu trữ' : c.effective_status}
-                                            </span>
-                                        </td>
-                                        {/* ── META ADS COLUMNS ── */}
-                                        <td className="px-1.5 py-2 text-right font-mono text-slate-700 font-semibold whitespace-nowrap">{formatVNDCompact(c.spend)}</td>
-                                        <td className="px-1.5 py-2 text-right font-mono font-bold text-blue-600">{c.purchases || "—"}</td>
-                                        <td className="px-1.5 py-2 text-right font-mono text-slate-500 whitespace-nowrap">{cpp > 0 ? formatVNDCompact(cpp) : "—"}</td>
-                                        <td className="px-1.5 py-2 text-right font-mono text-blue-600 font-medium whitespace-nowrap border-r border-slate-100">{c.conversion_value > 0 ? formatVNDCompact(c.conversion_value) : "—"}</td>
-                                        {/* ── POS COLUMNS ── */}
-                                        <td className="px-1.5 py-2 text-right font-mono font-bold text-red-600 bg-red-50/30">{c.pos_orders || "—"}</td>
-                                        <td className="px-1.5 py-2 text-right font-mono text-red-600 font-medium whitespace-nowrap bg-red-50/30">{c.pos_revenue > 0 ? formatVNDCompact(c.pos_revenue) : "—"}</td>
-                                        <td className={cn("px-1.5 py-2 text-right font-mono font-bold whitespace-nowrap bg-red-50/30 border-r border-slate-100",
-                                            posRoas >= 3 ? "text-emerald-600" : posRoas >= 1 ? "text-red-600" : "text-red-400")}>
-                                            {posRoas > 0 ? `${posRoas.toFixed(1)}x` : "—"}
-                                        </td>
-                                        {/* ── TƯƠNG TÁC COLUMNS ── */}
-                                        <td className="px-1.5 py-2 text-right font-mono text-slate-600">{c.messages || "—"}</td>
-                                        <td className="px-1.5 py-2 text-right font-mono text-slate-500 whitespace-nowrap">{cpcMsg > 0 ? formatVNDCompact(cpcMsg) : "—"}</td>
-                                        <td className="pr-4 pl-1.5 py-2 text-right font-mono text-slate-500">{c.comments || "—"}</td>
+                                    <tr key={idx} className="hover:bg-blue-50/50 dark:hover:bg-white/[0.03] transition-colors">
+                                        <td className="px-5 py-3.5"><div className="font-semibold text-foreground text-sm truncate max-w-[260px]" title={c.campaign_name}>{c.campaign_name}</div><div className="text-[11px] text-muted-foreground mt-0.5">{getAccountName(c.account_id)}</div></td>
+                                        <td className="px-3 py-3.5 text-center"><span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold", c.effective_status === 'ACTIVE' ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-slate-100 text-slate-500 border border-slate-200")}>{c.effective_status === 'ACTIVE' ? 'Hoạt động' : c.effective_status === 'PAUSED' ? 'Tạm dừng' : c.effective_status}</span></td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm font-medium">{formatVNDCompact(c.spend)}</td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm text-blue-600 font-bold">{c.purchases || "—"}</td>
+                                        <td className="px-3 py-3.5 text-right"><span className={cn("font-mono text-sm font-bold px-2 py-0.5 rounded", cpp > 45000 ? "text-rose-600 bg-rose-50 dark:bg-rose-500/10" : "text-blue-600 bg-blue-50 dark:bg-blue-500/10")}>{cpp > 0 ? formatVNDCompact(cpp) : "—"}</span></td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm text-red-600 font-bold">{c.pos_orders || "—"}</td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm font-medium">{c.pos_revenue > 0 ? formatVNDCompact(c.pos_revenue) : "—"}</td>
+                                        <td className="px-3 py-3.5 text-right"><span className={cn("font-mono text-sm font-bold", posRoas >= 3 ? "text-emerald-600" : posRoas > 0 ? "text-red-600" : "")}>{posRoas > 0 ? posRoas.toFixed(1) + "x" : "—"}</span></td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm text-muted-foreground">{c.messages || "—"}</td>
+                                        <td className="px-3 py-3.5 text-right font-mono text-sm text-muted-foreground">{cpcMsg > 0 ? formatVNDCompact(cpcMsg) : "—"}</td>
+                                        <td className="px-4 py-3.5 text-right font-mono text-sm text-muted-foreground">{c.comments || "—"}</td>
                                     </tr>
                                 );
                             }) : (
-                                <tr><td colSpan={12} className="py-12 text-center text-slate-400 italic text-xs">
-                                    {loading ? "Đang tải dữ liệu..." : `Không có dữ liệu cho ngày ${fromDate}`}
-                                </td></tr>
+                                <tr><td colSpan={11} className="py-12 text-center text-muted-foreground italic text-xs">{loading ? "Đang tải dữ liệu..." : "Không có dữ liệu"}</td></tr>
                             )}
                         </tbody>
-                        </table>
-                        <div className="h-14" />
-                </div>
-                {/* ── FIXED BOTTOM TOTALS BAR ── */}
-                {groupedCampaigns.length > 0 && (
-                    <div className="fixed bottom-0 left-[256px] right-0 z-50 bg-white border-t-2 border-slate-300 shadow-[0_-4px_16px_rgba(0,0,0,0.12)] overflow-x-auto">
-                        <table className="w-full text-[11px] table-fixed" style={{ minWidth: "1080px" }}>
-                            <colgroup>
-                                <col style={{ width: "20%" }} />
-                                <col style={{ width: "6%" }} />
-                                <col style={{ width: "8%" }} />
-                                <col style={{ width: "6%" }} />
-                                <col style={{ width: "7%" }} />
-                                <col style={{ width: "11%" }} />
-                                <col style={{ width: "6%" }} />
-                                <col style={{ width: "8%" }} />
-                                <col style={{ width: "7%" }} />
-                                <col style={{ width: "7%" }} />
-                                <col style={{ width: "7%" }} />
-                                <col style={{ width: "7%" }} />
-                            </colgroup>
-                            <tbody>
-                                <tr className="font-bold text-[11px]">
-                                    <td className="pl-4 pr-2 py-1.5 border-r border-slate-200" colSpan={2}>
-                                        <div className="text-slate-700 text-[10px] font-extrabold">
-                                            ⚡ Kết quả từ {groupedCampaigns.length} chiến dịch
-                                        </div>
-                                        {posBreakdown.length > 0 && (
-                                            <div className="flex flex-wrap gap-x-2 mt-0.5">
-                                                {posBreakdown.map(m => (
-                                                    <span key={m.name} className="text-[8px] text-red-500 font-semibold">
-                                                        {m.name} <span className="font-black">{m.count}</span> <span className="text-slate-400">({formatVNDCompact(m.revenue)})</span>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </td>
-                                    {/* META ADS totals */}
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-slate-700 whitespace-nowrap">{formatVNDCompact(d.spend)}</td>
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-blue-700">{d.purchases || "—"}</td>
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-slate-500 whitespace-nowrap">{d.cost_per_purchase > 0 ? formatVNDCompact(d.cost_per_purchase) : "—"}</td>
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-blue-700 whitespace-nowrap border-r border-slate-200">
-                                        {d.conversion_value > 0 ? formatVNDCompact(d.conversion_value) : "—"}
-                                        {d.roas > 0 && <span className="text-[9px] text-blue-500 ml-1">ROAS {d.roas.toFixed(2)}x</span>}
-                                    </td>
-                                    {/* POS totals */}
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-red-600 font-black bg-red-50/50">{dFinal.pos_orders || "—"}</td>
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-red-600 whitespace-nowrap bg-red-50/50">{dFinal.pos_revenue > 0 ? formatVNDCompact(dFinal.pos_revenue) : "—"}</td>
-                                    <td className={cn("px-1.5 py-1.5 text-right font-mono font-bold whitespace-nowrap bg-red-50/50 border-r border-slate-200",
-                                        dFinal.pos_roas >= 3 ? "text-emerald-600" : dFinal.pos_roas >= 1 ? "text-red-600" : "text-slate-400")}>
-                                        {dFinal.pos_roas > 0 ? `${dFinal.pos_roas.toFixed(1)}x` : "—"}
-                                    </td>
-                                    {/* Tương tác totals */}
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-slate-600">{d.messages || "—"}</td>
-                                    <td className="px-1.5 py-1.5 text-right font-mono text-slate-500 whitespace-nowrap">{d.cost_per_message > 0 ? formatVNDCompact(d.cost_per_message) : "—"}</td>
-                                    <td className="pr-4 pl-1.5 py-1.5 text-right font-mono text-slate-500">{d.comments || "—"}</td>
+                        {groupedCampaigns.length > 0 && (
+                            <tfoot>
+                                <tr className="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold text-sm">
+                                    <td className="px-5 py-3 uppercase tracking-wider text-xs">⚡ Kết quả từ {groupedCampaigns.length} chiến dịch</td>
+                                    <td className="px-3 py-3 text-center font-mono text-xs">{groupedCampaigns.filter(c=>c.effective_status==='ACTIVE').length}/{groupedCampaigns.length}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{formatVNDCompact(dFinal.spend)}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.purchases || "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_purchase > 0 ? formatVNDCompact(dFinal.cost_per_purchase) : "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_orders || "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_revenue > 0 ? formatVNDCompact(dFinal.pos_revenue) : "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_roas > 0 ? dFinal.pos_roas.toFixed(1) + "x" : "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.messages || "—"}</td>
+                                    <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_message > 0 ? formatVNDCompact(dFinal.cost_per_message) : "—"}</td>
+                                    <td className="px-4 py-3 text-right font-mono">{dFinal.comments || "—"}</td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </section>
-        </div>
-    );
-}
+                            </tfoot>
+                        )}
+                    </table>
+                </div>
 
-function MiniKPI({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color: string }) {
-    const borderColors: Record<string, string> = { blue: "border-l-blue-500", red: "border-l-red-500", slate: "border-l-slate-300" };
-    return (
-        <div className={cn("bg-white px-3 py-2.5 rounded-lg border border-slate-100 shadow-sm border-l-[3px]", borderColors[color])}>
-            <p className="text-[8px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">{label}</p>
-            <p className="text-lg font-black font-mono text-slate-800 leading-tight">{value}</p>
-            {sub && <p className="text-[9px] text-slate-400 mt-0.5">{sub}</p>}
+                {/* Footer */}
+                <div className="flex items-center justify-between px-5 py-3 border-t border-border text-xs text-muted-foreground">
+                    <span>Hiển thị {groupedCampaigns.length} chiến dịch</span>
+                    <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống ổn định</span>
+                        <span className="text-muted-foreground/60">•</span>
+                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400"></span> Đang đồng bộ Meta Ads</span>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
