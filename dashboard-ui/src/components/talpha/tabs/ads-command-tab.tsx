@@ -450,11 +450,12 @@ export default function TALPHAAdsCommandTab() {
                     <p className="text-sm text-muted-foreground mt-0.5">Quản lý và tối ưu hóa hiệu suất chiến dịch quảng cáo toàn diện</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 bg-white dark:bg-card border border-border rounded-lg px-3 py-2 text-sm text-muted-foreground">
-                        Hôm nay: {new Date().toLocaleDateString("vi-VN")}
-                    </div>
-                    <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-blue-500/20">
-                        + Tạo chiến dịch
+                    <input type="date" value={fromDate} onChange={e => { setFromDate(e.target.value); setToDate(e.target.value); }} className="bg-white dark:bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                    <button onClick={fetchData} disabled={loading} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-gray-100 dark:hover:bg-white/5 transition disabled:opacity-50">
+                        <RotateCw className={cn("h-4 w-4", loading && "animate-spin")} />
+                    </button>
+                    <button onClick={syncToSheet} disabled={syncing || !data} className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-emerald-500/20 disabled:opacity-50">
+                        <Save className="h-4 w-4" /> Sheet
                     </button>
                 </div>
             </div>
@@ -481,20 +482,6 @@ export default function TALPHAAdsCommandTab() {
 
             {/* TABLE SECTION */}
             <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-                    <div className="flex items-center gap-3">
-                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">ADS COMMAND CENTER</h3>
-                        <span className="bg-slate-100 dark:bg-white/10 text-muted-foreground text-xs font-semibold px-2.5 py-0.5 rounded-md">Tất cả ({groupedCampaigns.length})</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button onClick={syncToSheet} disabled={syncing || !data} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50">
-                            <Save className="h-3.5 w-3.5" /> Sheet
-                        </button>
-                        <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50">
-                            <RotateCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
-                        </button>
-                    </div>
-                </div>
 
                 {/* FILTERS */}
                 <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-gray-50/50 dark:bg-white/[0.02] flex-wrap">

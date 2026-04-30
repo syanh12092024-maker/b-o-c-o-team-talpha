@@ -29,11 +29,6 @@ const TAB_ITEMS = [
     { id: "pnl", label: "Lãi / Lỗ", icon: DollarSign },
     { id: "customers", label: "Khách hàng", icon: Users },
     { id: "market-intel", label: "Thị trường", icon: Globe },
-    { id: "spy", label: "Tìm SP Spy", icon: Search },
-    { id: "script", label: "Tạo kịch bản", icon: FileText },
-    { id: "flow", label: "Đặt và flow hàng", icon: ShoppingBag },
-    { id: "broadcast", label: "Gửi tin hàng loạt", icon: Send },
-    { id: "shipping", label: "Vận đơn", icon: Truck },
 ];
 
 export default function TALPHADashboardShell() {
