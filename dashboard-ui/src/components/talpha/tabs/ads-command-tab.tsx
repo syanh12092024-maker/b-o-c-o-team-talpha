@@ -459,32 +459,11 @@ export default function TALPHAAdsCommandTab() {
                     </button>
                 </div>
             </div>
-
-            {/* KPI CARDS */}
-            <div className="grid grid-cols-4 gap-4">
-                <div className="kpi-card relative overflow-hidden">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tổng Chi Phí</p>
-                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(Math.round(dFinal.spend))} <span className="text-sm font-normal text-muted-foreground">VNĐ</span></p>
-                </div>
-                <div className="kpi-card relative overflow-hidden">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Đơn Hàng (POS)</p>
-                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(dFinal.pos_orders)} <span className="text-sm font-normal text-muted-foreground">ĐƠN</span></p>
-                </div>
-                <div className="kpi-card relative overflow-hidden border-l-4 border-l-amber-400">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Doanh Thu Dự Kiến</p>
-                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{fmtN(Math.round(dFinal.pos_revenue))} <span className="text-sm font-normal text-muted-foreground">VNĐ</span></p>
-                </div>
-                <div className="kpi-card relative overflow-hidden">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chỉ Số ROAS</p>
-                    <p className="text-2xl font-bold text-foreground mt-1.5 font-mono">{dFinal.pos_roas > 0 ? dFinal.pos_roas.toFixed(2) : "—"} <span className="text-sm font-normal text-muted-foreground">x</span></p>
-                </div>
-            </div>
-
             {/* TABLE SECTION */}
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 180px)' }}>
 
                 {/* FILTERS */}
-                <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-gray-50/50 dark:bg-white/[0.02] flex-wrap">
+                <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-gray-50/50 dark:bg-white/[0.02] flex-wrap shrink-0">
                     <div className="flex flex-col gap-1">
                         <label className="text-[10px] font-semibold text-muted-foreground uppercase">Quốc gia</label>
                         <div className="relative" ref={countryRef}>
@@ -563,9 +542,9 @@ export default function TALPHAAdsCommandTab() {
                 )}
 
                 {/* TABLE */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
                     <table className="w-full text-sm">
-                        <thead>
+                        <thead className="sticky top-0 z-10">
                             <tr className="border-b border-border bg-gray-50/80 dark:bg-white/[0.03]">
                                 <th className="text-left px-5 py-3 text-[11px] font-bold text-muted-foreground uppercase">Chiến dịch / TKQC</th>
                                 <th className="text-center px-3 py-3 text-[11px] font-bold text-muted-foreground uppercase">Trạng thái</th>
@@ -604,33 +583,35 @@ export default function TALPHAAdsCommandTab() {
                                 <tr><td colSpan={11} className="py-12 text-center text-muted-foreground italic text-xs">{loading ? "Đang tải dữ liệu..." : "Không có dữ liệu"}</td></tr>
                             )}
                         </tbody>
-                        {groupedCampaigns.length > 0 && (
-                            <tfoot>
-                                <tr className="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold text-sm">
-                                    <td className="px-5 py-3 uppercase tracking-wider text-xs">⚡ Kết quả từ {groupedCampaigns.length} chiến dịch</td>
-                                    <td className="px-3 py-3 text-center font-mono text-xs">{groupedCampaigns.filter(c=>c.effective_status==='ACTIVE').length}/{groupedCampaigns.length}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{formatVNDCompact(dFinal.spend)}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.purchases || "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_purchase > 0 ? formatVNDCompact(dFinal.cost_per_purchase) : "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_orders || "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_revenue > 0 ? formatVNDCompact(dFinal.pos_revenue) : "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.pos_roas > 0 ? dFinal.pos_roas.toFixed(1) + "x" : "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.messages || "—"}</td>
-                                    <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_message > 0 ? formatVNDCompact(dFinal.cost_per_message) : "—"}</td>
-                                    <td className="px-4 py-3 text-right font-mono">{dFinal.comments || "—"}</td>
-                                </tr>
-                            </tfoot>
-                        )}
                     </table>
                 </div>
 
-                {/* Footer */}
-                <div className="flex items-center justify-between px-5 py-3 border-t border-border text-xs text-muted-foreground">
-                    <span>Hiển thị {groupedCampaigns.length} chiến dịch</span>
-                    <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống ổn định</span>
-                        <span className="text-muted-foreground/60">•</span>
-                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400"></span> Đang đồng bộ Meta Ads</span>
+                {/* STICKY SUMMARY — always visible at bottom */}
+                <div className="shrink-0 border-t-2 border-slate-700">
+                    <table className="w-full text-sm">
+                        <tbody>
+                            <tr className="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold">
+                                <td className="px-5 py-3 uppercase tracking-wider text-xs">⚡ Kết quả từ {groupedCampaigns.length} chiến dịch</td>
+                                <td className="px-3 py-3 text-center font-mono text-xs">{groupedCampaigns.filter(c=>c.effective_status==='ACTIVE').length}/{groupedCampaigns.length}</td>
+                                <td className="px-3 py-3 text-right font-mono">{formatVNDCompact(dFinal.spend)}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.purchases || "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_purchase > 0 ? formatVNDCompact(dFinal.cost_per_purchase) : "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.pos_orders || "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.pos_revenue > 0 ? formatVNDCompact(dFinal.pos_revenue) : "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.pos_roas > 0 ? dFinal.pos_roas.toFixed(1) + "x" : "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.messages || "—"}</td>
+                                <td className="px-3 py-3 text-right font-mono">{dFinal.cost_per_message > 0 ? formatVNDCompact(dFinal.cost_per_message) : "—"}</td>
+                                <td className="px-4 py-3 text-right font-mono">{dFinal.comments || "—"}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className="flex items-center justify-between px-5 py-2 border-t border-border/30 bg-slate-800 text-xs text-slate-400">
+                        <span>Hiển thị {groupedCampaigns.length} chiến dịch</span>
+                        <div className="flex items-center gap-3">
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Hệ thống ổn định</span>
+                            <span className="text-slate-600">•</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400"></span> Đang đồng bộ Meta Ads</span>
+                        </div>
                     </div>
                 </div>
             </div>
