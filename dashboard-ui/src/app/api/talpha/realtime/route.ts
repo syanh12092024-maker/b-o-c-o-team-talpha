@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TAlphaAdsModel } from "@/lib/bigquery/models/talpha-ads.model";
 import { GoogleSheetsSyncService } from "@/lib/google-sheets/services/talpha-sync.service";
+import { MktReportService } from "@/lib/google-sheets/services/mkt-report.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Vercel Pro: up to 60s for 21 ad accounts
@@ -62,17 +63,23 @@ export async function POST(req: NextRequest) {
         const result = TAlphaAdsModel.aggregate(ads, orders);
 
         const syncService = new GoogleSheetsSyncService(sheet_id);
-        
-        // Sync both general metrics and MKT-Market detailed breakdown
-        const [syncedData] = await Promise.all([
+        const mktReportService = new MktReportService(sheet_id);
+
+        // ═══ Sync to 3 targets in parallel ═══
+        // 1. Legacy "2026 auto" tab (backward compatible)
+        // 2. Legacy MKT-Market tabs in same sheet
+        // 3. NEW: Individual MKT tabs (e.g. "4. Lộc - SAUDI")
+        const [syncedData, , mktResult] = await Promise.all([
             syncService.syncAdsData({ date, ...result }),
-            syncService.syncMktReport(date, ads, orders)
+            syncService.syncMktReport(date, ads, orders),
+            mktReportService.syncByMktStructure(date, ads, orders),
         ]);
 
         return NextResponse.json({
             success: true,
-            message: "Sync Successful to '2026 auto'",
-            data: syncedData
+            message: `Sync OK → Sheet + ${mktResult?.synced || 0} MKT tabs`,
+            data: syncedData,
+            mkt_report: mktResult || null,
         });
     } catch (error: any) {
         console.error("POST SYNC ERROR:", error);
