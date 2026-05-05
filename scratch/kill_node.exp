@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 30
+set password "6Yp!5##Cd58s?inZ"
+spawn ssh -o StrictHostKeyChecking=no root@139.180.131.21 "killall -9 node npm || true && rm -rf /var/www/talpha/dashboard-ui/.next/lock"
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

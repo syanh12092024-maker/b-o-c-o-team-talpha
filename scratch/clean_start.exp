@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 60
+set password "6Yp!5##Cd58s?inZ"
+spawn ssh -o StrictHostKeyChecking=no root@139.180.131.21 "pm2 delete all && cd /var/www/talpha/dashboard-ui && ls -la .next && pm2 start npm --name 'talpha' -- start && pm2 save"
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

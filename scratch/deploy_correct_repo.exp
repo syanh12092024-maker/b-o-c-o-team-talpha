@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 600
+set password "6Yp!5##Cd58s?inZ"
+spawn ssh -o StrictHostKeyChecking=no root@139.180.131.21 "cd /var/www/talpha && git remote set-url origin https://github.com/syanh12092024-maker/b-o-c-o-team-talpha.git && git checkout -- . && git pull origin main && npm install && npm run build && pm2 restart talpha"
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}

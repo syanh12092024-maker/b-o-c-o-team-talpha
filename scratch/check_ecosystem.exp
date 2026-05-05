@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 30
+set password "6Yp!5##Cd58s?inZ"
+spawn ssh -o StrictHostKeyChecking=no root@139.180.131.21 "cat /var/www/talpha/ecosystem.config.js"
+expect {
+    "password:" {
+        send "$password\r"
+        exp_continue
+    }
+    eof
+}
