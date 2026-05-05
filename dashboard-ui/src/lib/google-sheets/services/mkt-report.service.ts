@@ -43,24 +43,20 @@ async function driveCall(auth: JWT, endpoint: string, opts?: RequestInit) {
     return res.json();
 }
 
-async function findOrCreateFolder(auth: JWT, name: string, parentId: string): Promise<string> {
+async function findFolder(auth: JWT, name: string, parentId: string): Promise<string | null> {
     const q = `name='${name.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
     const r = await driveCall(auth, `/files?q=${encodeURIComponent(q)}&fields=files(id)&supportsAllDrives=true&includeItemsFromAllDrives=true&corpora=allDrives`);
     if (r.files?.length > 0) return r.files[0].id;
-    const c = await driveCall(auth, "/files?supportsAllDrives=true", {
-        method: "POST", body: JSON.stringify({ name, mimeType: "application/vnd.google-apps.folder", parents: [parentId] }),
-    });
-    return c.id;
+    console.warn(`[MktReport] ⚠️ Folder "${name}" not found in ${parentId} — skip (run Apps Script to create)`);
+    return null;
 }
 
-async function findOrCreateSheet(auth: JWT, name: string, parentId: string): Promise<string> {
+async function findSheet(auth: JWT, name: string, parentId: string): Promise<string | null> {
     const q = `name='${name.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.spreadsheet' and '${parentId}' in parents and trashed=false`;
     const r = await driveCall(auth, `/files?q=${encodeURIComponent(q)}&fields=files(id)&supportsAllDrives=true&includeItemsFromAllDrives=true&corpora=allDrives`);
     if (r.files?.length > 0) return r.files[0].id;
-    const c = await driveCall(auth, "/files?supportsAllDrives=true", {
-        method: "POST", body: JSON.stringify({ name, mimeType: "application/vnd.google-apps.spreadsheet", parents: [parentId] }),
-    });
-    return c.id;
+    console.warn(`[MktReport] ⚠️ Sheet "${name}" not found in ${parentId} — skip (run Apps Script to create)`);
+    return null;
 }
 
 // ═══ Service ═══
@@ -102,12 +98,15 @@ export class MktReportService {
                 const display = MKT_DISPLAY[mktKey];
                 const folderName = display ? `${display.num}. ${display.name}` : mktKey;
                 try {
-                    const mktId = await findOrCreateFolder(this.auth, folderName, parentFolderId);
-                    const monthId = await findOrCreateFolder(this.auth, monthFolder, mktId);
+                    const mktId = await findFolder(this.auth, folderName, parentFolderId);
+                    if (!mktId) { errors.push(`${folderName}: folder not found — skip`); continue; }
+                    const monthId = await findFolder(this.auth, monthFolder, mktId);
+                    if (!monthId) { errors.push(`${folderName}/${monthFolder}: folder not found — skip`); continue; }
 
                     for (const item of items) {
                         try {
-                            const sid = await findOrCreateSheet(this.auth, item.market.toUpperCase(), monthId);
+                            const sid = await findSheet(this.auth, item.market.toUpperCase(), monthId);
+                            if (!sid) { errors.push(`${folderName}/${item.market}: sheet not found — skip`); continue; }
                             await this.upsertRow(sid, date, item);
                             syncCount++;
                         } catch (e: any) { errors.push(`${folderName}/${item.market}: ${e.message}`); }
@@ -119,9 +118,11 @@ export class MktReportService {
                         const totalMessages = items.reduce((s, i) => s + i.messages, 0);
                         const totalOrders = items.reduce((s, i) => s + i.pos_orders, 0);
                         const totalRevenue = items.reduce((s, i) => s + i.pos_revenue, 0);
-                        const summaryId = await findOrCreateSheet(this.auth, `TỔNG ADS THÁNG ${monthNum}`, monthId);
-                        await this.upsertRow(summaryId, date, { spend: totalSpend, messages: totalMessages, pos_orders: totalOrders, pos_revenue: totalRevenue });
-                        syncCount++;
+                        const summaryId = await findSheet(this.auth, `TỔNG ADS THÁNG ${monthNum}`, monthId);
+                        if (summaryId) {
+                            await this.upsertRow(summaryId, date, { spend: totalSpend, messages: totalMessages, pos_orders: totalOrders, pos_revenue: totalRevenue });
+                            syncCount++;
+                        } else { errors.push(`${folderName}/TỔNG: sheet not found — skip`); }
                     } catch (e: any) { errors.push(`${folderName}/TỔNG: ${e.message}`); }
                 } catch (e: any) { errors.push(`MKT ${mktKey}: ${e.message}`); }
             }
