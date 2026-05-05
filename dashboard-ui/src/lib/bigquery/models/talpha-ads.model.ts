@@ -368,49 +368,10 @@ export class TAlphaAdsModel {
             }
         });
 
-        // ═══ PASS 2: Match remaining orders by marketer name + market ═══
-        // For orders without ad_id (e.g. Japan POS), match by:
-        //   POS marketer name → campaign_key (from marketer_map)
-        //   POS shop_name → campaign market prefix (from MARKET_MAP)
-        const unmatchedOrders = orders.filter(o => !matchedOrderIds.has(o.id));
-        if (unmatchedOrders.length > 0) {
-            // Build campaign index: market/campaignKey → list of ad indices
-            const campaignIndex = new Map<string, number[]>();
-            ads.forEach((ad, idx) => {
-                const info = this.parseCampaign(ad.campaign_name);
-                const market = info.country; // e.g. "JAPAN"
-                const mktKey = this.removeDiacritics(info.marketerDisplay.toUpperCase()).trim();
-                if (market && mktKey) {
-                    const key = `${market}/${mktKey}`;
-                    if (!campaignIndex.has(key)) campaignIndex.set(key, []);
-                    campaignIndex.get(key)!.push(idx);
-                }
-            });
-
-            // Reverse MARKET_MAP: "Japan" → "JAPAN"
-            const shopToMarket: Record<string, string> = {};
-            Object.entries(this.MARKET_MAP).forEach(([k, v]) => { shopToMarket[v] = k; });
-
-            unmatchedOrders.forEach(order => {
-                const posMarketer = this.normalizeName(typeof order.marketer === 'string' ? order.marketer : '');
-                const campaignKey = marketerMap[posMarketer];
-                if (!campaignKey) return;
-
-                const market = shopToMarket[order.shop_name] || '';
-                if (!market) return;
-
-                const lookupKey = `${market}/${campaignKey}`;
-                const indices = campaignIndex.get(lookupKey);
-                if (indices && indices.length > 0) {
-                    // Distribute to the campaign with highest spend
-                    const bestIdx = indices.reduce((best, idx) =>
-                        ads[idx].spend > ads[best].spend ? idx : best, indices[0]);
-                    ads[bestIdx].orders += 1;
-                    ads[bestIdx].revenue_vnd += order.total_price_vnd;
-                    matchedOrderIds.add(order.id);
-                }
-            });
-        }
+        // ═══ PASS 2: DISABLED ═══
+        // Previously matched by marketer name + market, but caused false attribution
+        // (e.g. all Chu Thuý unmatched orders dumped into highest-spend campaign).
+        // Orders without ad_id match stay "unmatched" — still counted in total POS via orders.length.
 
         // Log remaining unmatched
         const finalUnmatched = orders.filter(o => !matchedOrderIds.has(o.id));
