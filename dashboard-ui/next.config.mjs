@@ -5,6 +5,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'standalone',
     turbopack: {},
     // Fix "multiple lockfiles" warning — tell Next.js the workspace root is dashboard-ui/
     outputFileTracingRoot: __dirname,
