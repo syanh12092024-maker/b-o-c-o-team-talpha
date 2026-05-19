@@ -16,6 +16,7 @@ export interface TAlphaOrder {
     id: string;
     shop_name: string;
     ad_id: string | null;
+    page_id: string | null;
     marketer: string;
     total_price_local: number;
     total_price_vnd: number;
@@ -301,6 +302,7 @@ export class TAlphaAdsModel {
                                 id: String(o.id),
                                 shop_name: shop.name,
                                 ad_id: o.ad_id,
+                                page_id: o.page_id ? String(o.page_id) : null,
                                 marketer: o.marketer?.name || o.marketer || "N/A",
                                 total_price_local: priceLocal,
                                 total_price_vnd: priceLocal * rate,
@@ -368,16 +370,59 @@ export class TAlphaAdsModel {
             }
         });
 
-        // ═══ PASS 2: DISABLED ═══
-        // Previously matched by marketer name + market, but caused false attribution
-        // (e.g. all Chu Thuý unmatched orders dumped into highest-spend campaign).
-        // Orders without ad_id match stay "unmatched" — still counted in total POS via orders.length.
+        // ═══ PASS 2: Match by page_id + market (for orders without ad_id) ═══
+        // POS orders have page_id (Facebook Page the customer came from).
+        // Campaign names contain pageId at parts[3]: COUNTRY/MKT/Product/PageID/...
+        // Match: order.page_id === campaign.pageId AND order.shop_name maps to campaign.country
+
+        // Reverse market map: shop_name → campaign prefix (e.g. "Saudi" → "SAUDI")
+        const REVERSE_MARKET: Record<string, string> = {};
+        Object.entries(this.MARKET_MAP).forEach(([prefix, shopName]) => {
+            REVERSE_MARKET[shopName] = prefix;
+        });
+
+        // Build (market::pageId) → best ad index (highest spend)
+        const pageMarketMap = new Map<string, number>();
+        ads.forEach((ad, idx) => {
+            const info = this.parseCampaign(ad.campaign_name);
+            const pageId = (info.pageId || '').trim();
+            if (pageId && info.country) {
+                const key = `${info.country}::${pageId}`;
+                const existingIdx = pageMarketMap.get(key);
+                if (existingIdx === undefined || ad.spend > ads[existingIdx].spend) {
+                    pageMarketMap.set(key, idx);
+                }
+            }
+        });
+
+        // Match unmatched orders by page_id
+        let pass2Matched = 0;
+        orders.forEach(order => {
+            if (matchedOrderIds.has(order.id)) return;
+            const pageId = order.page_id ? String(order.page_id).trim() : null;
+            if (!pageId) return;
+
+            const marketPrefix = REVERSE_MARKET[order.shop_name];
+            if (!marketPrefix) return;
+
+            const key = `${marketPrefix}::${pageId}`;
+            const adIdx = pageMarketMap.get(key);
+            if (adIdx !== undefined) {
+                ads[adIdx].orders += 1;
+                ads[adIdx].revenue_vnd += order.total_price_vnd;
+                matchedOrderIds.add(order.id);
+                pass2Matched++;
+            }
+        });
+        if (pass2Matched > 0) {
+            console.log(`[POS] PASS 2 (page_id): ${pass2Matched} orders matched`);
+        }
 
         // Log remaining unmatched
         const finalUnmatched = orders.filter(o => !matchedOrderIds.has(o.id));
         if (finalUnmatched.length > 0) {
             const unmatchedRevenue = finalUnmatched.reduce((s, o) => s + o.total_price_vnd, 0);
-            console.log(`[POS] ${finalUnmatched.length} orders unmatched — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
+            console.log(`[POS] ${finalUnmatched.length} orders still unmatched (no ad_id, no page_id match) — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
         }
 
         // ═══ Aggregate totals ═══
