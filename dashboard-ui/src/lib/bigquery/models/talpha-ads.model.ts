@@ -418,11 +418,75 @@ export class TAlphaAdsModel {
             console.log(`[POS] PASS 2 (page_id): ${pass2Matched} orders matched`);
         }
 
+        // ═══ PASS 3: Match by marketer name + market (last resort) ═══
+        // For orders with no ad_id AND no matching page_id,
+        // use POS marketer name → campaign marketer key mapping.
+        // e.g. POS marketer "Trần Thế" → campaign key "N.THE"
+
+        // POS marketer name → campaign marketer key
+        const POS_MARKETER_MAP: Record<string, string> = {
+            [this.normalizeName("Trần Thế")]: "N.THE",   [this.normalizeName("Nguyễn Thế")]: "N.THE",
+            [this.normalizeName("Trần Ngọc Thế")]: "N.THE",
+            [this.normalizeName("Chu Thuý")]: "C.THUY",   [this.normalizeName("Chu Thị Thuý")]: "C.THUY",
+            [this.normalizeName("Sỹ Lộc")]: "LOC",        [this.normalizeName("Hồ Sỹ Lộc")]: "LOC",
+            [this.normalizeName("Sỹ Anh")]: "S.ANH",      [this.normalizeName("Hồ Sỹ Anh")]: "S.ANH",
+            [this.normalizeName("Thuùy Nhung")]: "NHUNG",  [this.normalizeName("Hoàng Thị Thuùy Nhung")]: "NHUNG",
+            [this.normalizeName("Nhung")]: "NHUNG",
+            [this.normalizeName("Thục Mai")]: "MAI",       [this.normalizeName("Phạm Hà Thục Mai")]: "MAI",
+            [this.normalizeName("Thục Bình")]: "BINH",     [this.normalizeName("Lê Thục Bình")]: "BINH",
+            [this.normalizeName("Mạnh")]: "MANH",          [this.normalizeName("N.Thế")]: "N.THE",
+        };
+        // Also load from config marketer_map (if defined)
+        Object.entries(marketerMap).forEach(([posName, campaignKey]) => {
+            POS_MARKETER_MAP[posName] = campaignKey;
+        });
+
+        // Build (market::marketerKey) → best ad index (highest spend)
+        const mktMarketMap = new Map<string, number>();
+        ads.forEach((ad, idx) => {
+            const info = this.parseCampaign(ad.campaign_name);
+            const mktKey = info.marketer; // already normalized uppercase no-diacritics
+            if (mktKey && info.country) {
+                const key = `${info.country}::${mktKey}`;
+                const existingIdx = mktMarketMap.get(key);
+                if (existingIdx === undefined || ad.spend > ads[existingIdx].spend) {
+                    mktMarketMap.set(key, idx);
+                }
+            }
+        });
+
+        // Match remaining unmatched orders by marketer + market
+        let pass3Matched = 0;
+        orders.forEach(order => {
+            if (matchedOrderIds.has(order.id)) return;
+
+            const marketPrefix = REVERSE_MARKET[order.shop_name];
+            if (!marketPrefix) return;
+
+            // Try to map POS marketer name → campaign key
+            const posMarketerNorm = this.normalizeName(order.marketer);
+            const campaignKey = POS_MARKETER_MAP[posMarketerNorm];
+            if (!campaignKey) return;
+
+            const key = `${marketPrefix}::${campaignKey}`;
+            const adIdx = mktMarketMap.get(key);
+            if (adIdx !== undefined) {
+                ads[adIdx].orders += 1;
+                ads[adIdx].revenue_vnd += order.total_price_vnd;
+                matchedOrderIds.add(order.id);
+                pass3Matched++;
+            }
+        });
+        if (pass3Matched > 0) {
+            console.log(`[POS] PASS 3 (marketer+market): ${pass3Matched} orders matched`);
+        }
+
         // Log remaining unmatched
         const finalUnmatched = orders.filter(o => !matchedOrderIds.has(o.id));
         if (finalUnmatched.length > 0) {
             const unmatchedRevenue = finalUnmatched.reduce((s, o) => s + o.total_price_vnd, 0);
-            console.log(`[POS] ${finalUnmatched.length} orders still unmatched (no ad_id, no page_id match) — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
+            const details = finalUnmatched.slice(0, 5).map(o => `${o.shop_name}/${o.marketer}/page:${o.page_id || 'N/A'}`).join(', ');
+            console.log(`[POS] ${finalUnmatched.length} orders still unmatched — ${unmatchedRevenue.toLocaleString()}đ — samples: ${details}`);
         }
 
         // ═══ Aggregate totals ═══
