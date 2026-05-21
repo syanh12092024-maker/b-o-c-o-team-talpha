@@ -33,8 +33,25 @@ export async function GET(req: NextRequest) {
             TAlphaAdsModel.fetchPOSHybrid(fromDate, toDate),
         ]);
 
-        // Step 2: Run aggregate directly (Strict Direct Match)
-        const result = TAlphaAdsModel.aggregate(ads, orders);
+        // Step 1.5: Resolve unmatched ad_ids via Facebook Graph API lookups
+        const activeAdIds = new Set<string>(ads.map(ad => String(ad.ad_id)));
+        const unmatchedAdIds = new Set<string>();
+        orders.forEach(order => {
+            if (order.ad_id) {
+                const adIdStr = String(order.ad_id).trim();
+                if (adIdStr && !activeAdIds.has(adIdStr)) {
+                    unmatchedAdIds.add(adIdStr);
+                }
+            }
+        });
+
+        let adLookupMap = new Map<string, { campaign_id: string; campaign_name: string; account_id: string }>();
+        if (unmatchedAdIds.size > 0) {
+            adLookupMap = await TAlphaAdsModel.resolveUnmatchedAds(Array.from(unmatchedAdIds), cfg.meta_ads.access_token);
+        }
+
+        // Step 2: Run aggregate with lookup map
+        const result = TAlphaAdsModel.aggregate(ads, orders, adLookupMap);
 
         return NextResponse.json({
             success: true,
@@ -62,13 +79,31 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: "Missing date or sheet_id" }, { status: 400 });
         }
 
+        const cfg = TAlphaAdsModel.loadConfig();
         const [metaResult, orders] = await Promise.all([
             TAlphaAdsModel.fetchMetaAds(date, date),
             TAlphaAdsModel.fetchPOSHybrid(date, date),
         ]);
         const { ads } = metaResult;
 
-        const result = TAlphaAdsModel.aggregate(ads, orders);
+        // Resolve unmatched ad_ids
+        const activeAdIds = new Set<string>(ads.map(ad => String(ad.ad_id)));
+        const unmatchedAdIds = new Set<string>();
+        orders.forEach(order => {
+            if (order.ad_id) {
+                const adIdStr = String(order.ad_id).trim();
+                if (adIdStr && !activeAdIds.has(adIdStr)) {
+                    unmatchedAdIds.add(adIdStr);
+                }
+            }
+        });
+
+        let adLookupMap = new Map<string, { campaign_id: string; campaign_name: string; account_id: string }>();
+        if (unmatchedAdIds.size > 0) {
+            adLookupMap = await TAlphaAdsModel.resolveUnmatchedAds(Array.from(unmatchedAdIds), cfg.meta_ads.access_token);
+        }
+
+        const result = TAlphaAdsModel.aggregate(ads, orders, adLookupMap);
 
         const syncService = new GoogleSheetsSyncService(sheet_id);
         const mktReportService = new MktReportService(sheet_id);
