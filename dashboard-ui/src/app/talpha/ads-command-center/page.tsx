@@ -30,12 +30,14 @@ interface RealtimeCampaign {
     account_id: string; account_name: string; campaign_id: string; campaign_name: string;
     spend_vnd: number; impressions: number; cpm_vnd: number; ctr: number;
     messages: number; purchases: number; orders: number; revenue_vnd: number; roas: number;
+    bot_orders?: number; bot_revenue_vnd?: number;
     ads_count: number; ads: AdDetail[];
 }
 
 interface Summary {
     total_spend_vnd: number; total_revenue_vnd: number; total_orders: number;
     total_messages: number; matched_orders: number; unmatched_orders: number;
+    bot_orders?: number; bot_revenue_vnd?: number;
     total_pos_orders: number; total_meta_purchases: number; blended_roas: number;
     accounts_fetched: number; shops_fetched: number;
     matched_revenue_vnd: number; unmatched_revenue_vnd: number;
@@ -266,12 +268,16 @@ export default function TALPHAAdsCommandCenterPage() {
                         <div className="p-3 border-r border-slate-700 bg-blue-500/5">
                             <div className="text-blue-400 text-[10px] font-semibold uppercase">📦 Đơn POS</div>
                             <div className="text-xl font-bold font-mono text-blue-400">{summary.total_pos_orders}</div>
-                            <div className="text-[10px] text-slate-500">Match: {summary.matched_orders} | Chưa: {summary.unmatched_orders}</div>
+                            <div className="text-[10px] text-slate-500">
+                                Match: {summary.matched_orders} | 🤖 Bot: {summary.bot_orders || 0} | Chưa: {summary.unmatched_orders}
+                            </div>
                         </div>
                         <div className="p-3 border-r border-slate-700 bg-emerald-500/5">
                             <div className="text-emerald-400 text-[10px] font-semibold uppercase">💵 Doanh thu ({summary.total_pos_orders} đơn)</div>
                             <div className="text-xl font-bold font-mono text-emerald-400">{formatVNDCompact(summary.total_revenue_vnd)}</div>
-                            <div className="text-[10px] text-slate-500">{summary.matched_orders} match + {summary.unmatched_orders} chưa match</div>
+                            <div className="text-[10px] text-slate-500">
+                                {formatVNDCompact(summary.matched_revenue_vnd)} match + {formatVNDCompact(summary.bot_revenue_vnd || 0)} bot + {formatVNDCompact(summary.unmatched_revenue_vnd)} chưa
+                            </div>
                         </div>
                         <div className="p-3">
                             <div className="text-amber-400 text-[10px] font-semibold uppercase">📈 ROAS (100%)</div>
@@ -343,8 +349,8 @@ export default function TALPHAAdsCommandCenterPage() {
                 ) : (
                     Object.entries(grouped).map(([accId, accCampaigns]) => {
                         const accSpend = accCampaigns.reduce((s, c) => s + c.spend_vnd, 0);
-                        const accRevenue = accCampaigns.reduce((s, c) => s + c.revenue_vnd, 0);
-                        const accOrders = accCampaigns.reduce((s, c) => s + c.orders, 0);
+                        const accRevenue = accCampaigns.reduce((s, c) => s + c.revenue_vnd + (c.bot_revenue_vnd || 0), 0);
+                        const accOrders = accCampaigns.reduce((s, c) => s + c.orders + (c.bot_orders || 0), 0);
                         const accPurchases = accCampaigns.reduce((s, c) => s + c.purchases, 0);
                         const accRoas = accSpend > 0 ? accRevenue / accSpend : 0;
 
@@ -382,6 +388,7 @@ export default function TALPHAAdsCommandCenterPage() {
                                                 <th className="px-2 py-2 text-right text-indigo-300">CPA MSG</th>
                                                 <th className="px-2 py-2 text-right bg-purple-500/10 text-purple-300">🛒 META</th>
                                                 <th className="px-2 py-2 text-right bg-emerald-500/10 text-emerald-300">📦 POS</th>
+                                                <th className="px-2 py-2 text-right bg-teal-500/10 text-teal-300">🤖 BOT</th>
                                                 <th className="px-2 py-2 text-right bg-emerald-500/10 text-emerald-300">💰 DT</th>
                                                 <th className="px-2 py-2 text-right bg-emerald-500/10 text-emerald-300">📈 ROAS</th>
                                             </tr>
@@ -389,6 +396,7 @@ export default function TALPHAAdsCommandCenterPage() {
                                         <tbody className="divide-y divide-slate-700/50">
                                             {accCampaigns.map(c => {
                                                 const isExpanded = expandedCampaign === c.campaign_id;
+                                                const totalCampRevenue = c.revenue_vnd + (c.bot_revenue_vnd || 0);
                                                 return (
                                                     <>
                                                         {/* Campaign row */}
@@ -417,9 +425,11 @@ export default function TALPHAAdsCommandCenterPage() {
                                                                 c.purchases > 0 ? 'text-purple-400' : 'text-slate-600')}>{c.purchases || 0}</td>
                                                             <td className={cn("px-2 py-2.5 text-right font-mono font-bold bg-emerald-500/5",
                                                                 c.orders > 0 ? 'text-emerald-400' : 'text-slate-600')}>{c.orders}</td>
+                                                            <td className={cn("px-2 py-2.5 text-right font-mono font-bold bg-teal-500/5",
+                                                                c.bot_orders && c.bot_orders > 0 ? 'text-teal-400' : 'text-slate-600')}>{c.bot_orders || 0}</td>
                                                             <td className={cn("px-2 py-2.5 text-right font-mono bg-emerald-500/5 text-xs",
-                                                                c.revenue_vnd > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600')}>
-                                                                {c.revenue_vnd > 0 ? formatVNDCompact(c.revenue_vnd) : '-'}
+                                                                totalCampRevenue > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600')}>
+                                                                {totalCampRevenue > 0 ? formatVNDCompact(totalCampRevenue) : '-'}
                                                             </td>
                                                             <td className={cn("px-2 py-2.5 text-right font-mono font-bold bg-emerald-500/5",
                                                                 c.roas > 2.5 ? 'text-emerald-400' : c.roas > 0 ? 'text-rose-400' : 'text-slate-600')}>
@@ -448,6 +458,7 @@ export default function TALPHAAdsCommandCenterPage() {
                                                                     ad.purchases > 0 ? 'text-purple-400' : 'text-slate-600')}>{ad.purchases || 0}</td>
                                                                 <td className={cn("px-2 py-1.5 text-right font-mono text-[10px] bg-emerald-500/5",
                                                                     ad.orders > 0 ? 'text-emerald-400 font-bold' : 'text-slate-600')}>{ad.orders}</td>
+                                                                <td className="px-2 py-1.5 text-right font-mono text-[10px] bg-teal-500/5 text-slate-600">-</td>
                                                                 <td className={cn("px-2 py-1.5 text-right font-mono text-[10px] bg-emerald-500/5",
                                                                     ad.revenue_vnd > 0 ? 'text-emerald-400' : 'text-slate-600')}>
                                                                     {ad.revenue_vnd > 0 ? formatVNDCompact(ad.revenue_vnd) : '-'}

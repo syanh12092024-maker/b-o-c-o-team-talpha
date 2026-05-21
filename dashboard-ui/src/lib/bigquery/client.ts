@@ -1,8 +1,13 @@
 import { BigQuery } from "@google-cloud/bigquery";
 import path from "path";
+import fs from "fs";
 
-// Updated path to reference the shared config safely
-const keyFilename = path.resolve(process.cwd(), "config/bigquery-key.json");
+// Support both: cwd=dashboard-ui (local dev) and cwd=project-root (server/PM2)
+const keyFilename = (() => {
+    const fromCwd = path.resolve(process.cwd(), "config/bigquery-key.json");
+    if (fs.existsSync(fromCwd)) return fromCwd;
+    return path.resolve(process.cwd(), "..", "config/bigquery-key.json");
+})();
 const projectId = "levelup-465304";
 
 export const bigquery = new BigQuery({

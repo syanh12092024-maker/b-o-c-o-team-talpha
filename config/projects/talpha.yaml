@@ -18,18 +18,53 @@ bigquery:
 
 # ─── 3. FACEBOOK ADS ───
 meta_ads:
-  app_id: "904939858795500"
-  app_secret: "${AUUS1_META_APP_SECRET}"               # ⚠️ Shared with AUUS1, value in .env
-  access_token: "${AUUS1_META_ACCESS_TOKEN}"             # ⚠️ Shared with AUUS1, value in .env
+  app_id: "1492490978955925"
+  app_secret: "d056d01a049989e8cd8fe7f7cfe3178d"
+  access_token: "EAAVNaaKhkpUBRMH40ZAndoGZAO3pYZBuU5vgQDHy74YZAePgbwnBKZBJ6PDZBmkh7ZCI2SZBHGe46DwzXtnH44N5TJZCizn8Y6nin3LinPncbsZCOf256qTdDKrHaUZAQHEyf6q7fCDgnQiHeIEXJFeUU0UIG8EwA8BsZCYoqSbdZAH0bFpZC2w9tCMEQ80IdZAh5ZCB"
   ad_account_ids:
+    # ── Sỹ Lộc (4 TK) ──
     - "act_855567553811483"       # Sỹ Lộc 01
-    - "act_3534017756739334"      # Kuwait +3
-    - "act_848995974322757"       # Chu Thuý 02
-    - "act_719840753771124"       # Tiểu Alpha 4
-    - "act_1119368126847210"      # Trang sức 2 - Dubai
+    - "act_934116652330312"       # Sỹ Lộc 02
+    - "act_1284981146939856"      # Sỹ Lộc 03
+    - "act_1614386202936215"      # Sỹ Lộc 04
+    # ── Chu Thuý (4 TK) ──
     - "act_833593695771745"       # Chu Thuý 01
-    - "act_703242242813144"       # Trang sức 1 - Dubai
-    - "act_1503790877534258"      # Tiểu Alpha 3
+    - "act_848995974322757"       # Chu Thuý 02
+    - "act_1461543545434816"      # Chu Thuý 03
+    - "act_1437142241537275"      # Chu Thuý 04
+    # ── Nhung (6 TK) ──
+    - "act_1223948656596727"      # Nhung LevelUp - 01
+    - "act_1670686890508970"      # Nhung 02
+    - "act_923574177322682"       # Nhung 03
+    - "act_2710483295993252"      # Nhung 04
+    - "act_25706199102388719"     # Nhung 05
+    - "act_1272638375040037"      # Nhung 06
+    # ── N.Thế (5 TK) ──
+    - "act_1670240591020196"      # N.Thế 01
+    - "act_946287684758283"       # N.Thế 02
+    - "act_916423977810241"       # N.Thế 03
+    - "act_26411407608471378"     # N.Thế 04
+    - "act_1653063986109325"      # N.Thế 05
+    # ── Mạnh (2 TK) ──
+    - "act_1660923908668482"      # Mạnh 01
+    - "act_937483619152247"       # Mạnh 02
+    # ── Mai (2 TK) ──
+    - "act_869269479518459"       # Mai 01
+    - "act_4206311709698762"      # Mai 02
+    # ── Sỹ Anh (3 TK) ──
+    - "act_962218859667133"       # S.ANH - 01 - ĐÔNG Á
+    - "act_939548861921691"       # S.ANH - 02 - ĐÔNG Á
+    - "act_2049977905930743"      # Sỹ Anh 03
+    # ── Trang Sức & Đặc biệt (6 TK) ──
+    - "act_3534017756739334"      # Kuwait +3
+    - "act_703242242813144"       # Trang Sức +1
+    - "act_4382396978703883"      # Trang sức 27/04/2026
+    - "act_416558701342048"       # Tiểu Alpha 1
+    - "act_1249019484033894"      # Sỹ Anh 02
+    - "act_1670165974333671"      # Nhật Bản - 03
+    - "act_1420244962877096"      # TK ĐÀi
+    - "act_976131321619273"       # TK ĐKY Page
+
   business_id: "1356322402694811"
   pixel_id: ""                    # ❌ CẦN BỔ SUNG (nếu có)
 
@@ -40,40 +75,50 @@ poscake:
   shops:
     - name: "Saudi"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_SA_KEY}"               # ⚠️ Actual value in .env
+      api_key: "441cc47ce8a740b09bbfec1261696cb0"
       shop_id: "1328205216"
     - name: "UAE"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_AE_KEY}"               # ⚠️ Actual value in .env
+      api_key: "f8ee67fa7ade46beaf3bc9da2fc81b13"
       shop_id: "1635200759"
     - name: "Kuwait"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_KW_KEY}"               # ⚠️ Actual value in .env
+      api_key: "667685818bcd4da39a604c5df27f29b5"
       shop_id: "1328205226"
     - name: "Oman"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_OM_KEY}"               # ⚠️ Actual value in .env
+      api_key: "4f09342a9cd84b8fa630f33f5885a23e"
       shop_id: "1942200986"
     - name: "Qatar"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_QA_KEY}"               # ⚠️ Actual value in .env
+      api_key: "62a53f9e1b334e97906a583e4d567001"                 # ❌ CẦN BỔ SUNG
       shop_id: "1021271617"
     - name: "Bahrain"
       api_url: "https://pos.pages.fm/api/v1"
-      api_key: "${TALPHA_POSCAKE_BH_KEY}"               # ⚠️ Actual value in .env
+      api_key: "72ab4b141a4842579308e2b8cd4d5831"
       shop_id: "100943483"
+    - name: "Japan"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "de34eb3fc92041ce94a41cde5e78a8f9"
+      shop_id: "100293585"
+    - name: "Taiwan"
+      api_url: "https://pos.pages.fm/api/v1"
+      api_key: "1d5e719041a34861be0076cdb26f9688"
+      shop_id: "1328343252"
   shop_ids:
-    - "132820521"                 # Saudi
+    - "1328205216"                # Saudi
     - "1635200759"                # UAE
     - "1328205226"                # Kuwait
     - "1942200986"                # Oman
     - "1021271617"                # Qatar
     - "100943483"                 # Bahrain
+    - "100293585"                 # Japan
+    - "1328343252"                # Taiwan
 
 # ─── 5. PANCAKE CRM ───
 pancake:
   api_url: "https://pages.fm/api/v1"
-  api_token: "${TALPHA_PANCAKE_API_TOKEN}"              # ⚠️ Actual value in .env
+  api_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU-G7uSBBbmgiLCJleHAiOjE3ODE1OTkyNDksImFwcGxpY2F0aW9uIjoxLCJ1aWQiOiI0MTI1MTM5Yi0xYTRiLTQwYzEtODI0MC1jYWI2MGE0ZTgxYjEiLCJzZXNzaW9uX2lkIjoiMWZkNWI2Y2YtMzhjZS00MGY1LWIxODctNDk3YjdiMDY5OTkxIiwiaWF0IjoxNzczODIzMjQ5LCJmYl9pZCI6Ijc0OTYzODMwNDczMjIzOSIsImxvZ2luX3Nlc3Npb24iOm51bGwsImZiX25hbWUiOiJT4bu5IEFuaCJ9.qJhuBCLDLUAql2ofU2YMBiHTgudXP0ySTu-Bi5hbEcE"
   page_ids:
     - ""                          # CẦN BỔ SUNG nếu có
 
@@ -170,6 +215,14 @@ markets:
     name: "Qatar"
     currency: QAR
     warehouse: ""
+  - code: JP
+    name: "Nhật Bản"
+    currency: JPY
+    warehouse: ""
+  - code: TW
+    name: "Đài Loan"
+    currency: TWD
+    warehouse: ""
 
 # ─── 8. DISCORD NOTIFICATIONS ───
 discord:
@@ -199,6 +252,45 @@ marketers:
   - id: "LTB"
     name: "Lê Thục Bình"
     role: "Marketer"
+
+# ─── 10b. POS MARKETER MAP ───
+# Ánh xạ tên marketer trong POS Cake → campaign key (phần [1] trong campaign name)
+marketer_map:
+  - pos_name: "Trần Thế"
+    campaign_key: "N.THE"
+  - pos_name: "Nguyễn Thế"
+    campaign_key: "N.THE"
+  - pos_name: "Trần Ngọc Thế"
+    campaign_key: "N.THE"
+  - pos_name: "Chu Thúy"
+    campaign_key: "C.THUY"
+  - pos_name: "Chu Thị Thuý"
+    campaign_key: "C.THUY"
+  - pos_name: "Sỹ Lộc"
+    campaign_key: "LOC"
+  - pos_name: "Hồ Sỹ Lộc"
+    campaign_key: "LOC"
+  - pos_name: "Sỹ Anh"
+    campaign_key: "S.ANH"
+  - pos_name: "Hồ Sỹ Anh"
+    campaign_key: "S.ANH"
+  - pos_name: "Thuỳ Nhung"
+    campaign_key: "NHUNG"
+  - pos_name: "Hoàng Thị Thuỳ Nhung"
+    campaign_key: "NHUNG"
+  - pos_name: "Thục Mai"
+    campaign_key: "MAI"
+  - pos_name: "Phạm Hà Thục Mai"
+    campaign_key: "MAI"
+  - pos_name: "Thục Bình"
+    campaign_key: "BINH"
+  - pos_name: "Lê Thục Bình"
+    campaign_key: "BINH"
+  - pos_name: "Mạnh"
+    campaign_key: "MANH"
+  - pos_name: "MẠNH AK47"
+    campaign_key: "MANH"
+
 
 # ─── 10. SẢN PHẨM + GIÁ VỐN (valid_from: 2026-02-01) ───
 products:
@@ -345,6 +437,12 @@ exchange_rates:
   - from: USD
     to: VND
     rate: 25700
+  - from: JPY
+    to: VND
+    rate: 166
+  - from: TWD
+    to: VND
+    rate: 823
 
 # ─── 13. GIÁ BÁN (PRICING TIERS) ───
 # POS lưu giá ÷100 (10000 = 100.00 AED)
@@ -400,7 +498,7 @@ operations:
 # ─── 16. GHI CHÚ ───
 notes: |
   - Team Tiểu Alpha (7 marketer), thị trường GCC (6 nước)
-  - Currency chính: AED, 8 tài khoản QC Facebook
+  - Currency chính: AED, 21 tài khoản QC Facebook
   - 3PL: iMile (SA, AE, QA, OM) + PostaPlus (KW) + Aramex (BH)
   - Ngành: Trang sức + Mỹ phẩm, target phụ nữ Philippines ở GCC
   - 27 SKU (trang sức + skincare)
