@@ -17,6 +17,8 @@ interface RealtimeData {
     total_roas: number; total_cost_per_purchase: number; total_cost_per_message: number;
     pos_orders: number; pos_revenue: number; pos_roas: number;
     ads: any[]; orders: any[];
+    campaigns?: any[]; // Aggregated campaigns with POS data from model
+    summary?: any; // Summary stats from model aggregate
 }
 
 const ACCOUNT_NAMES: Record<string, string> = {
@@ -340,6 +342,22 @@ export default function TALPHAAdsCommandTab() {
         ? accountIds.filter(id => getAccountName(id).toLowerCase().includes(accountSearch.toLowerCase()))
         : accountIds;
 
+    // Build campaign_id → POS data lookup from data.campaigns (aggregated with POS attribution)
+    const campaignPosMap = useMemo(() => {
+        const map = new Map<string, { pos_orders: number; pos_revenue: number; bot_orders: number; bot_revenue: number }>();
+        if (data?.campaigns) {
+            data.campaigns.forEach((c: any) => {
+                map.set(c.campaign_id, {
+                    pos_orders: c.orders || 0,
+                    pos_revenue: c.revenue_vnd || 0,
+                    bot_orders: c.bot_orders || 0,
+                    bot_revenue: c.bot_revenue_vnd || 0,
+                });
+            });
+        }
+        return map;
+    }, [data]);
+
     const groupedCampaigns = useMemo(() => {
         const groups: Record<string, any[]> = {};
         filteredAds.forEach((ad: any) => {
@@ -349,6 +367,7 @@ export default function TALPHAAdsCommandTab() {
         });
         const campaignRows = Object.entries(groups).map(([, ads]) => {
             const f = ads[0];
+            const posData = campaignPosMap.get(f.campaign_id);
             return {
                 account_id: f.account_id, campaign_id: f.campaign_id, campaign_name: f.campaign_name,
                 effective_status: f.effective_status || 'UNKNOWN',
@@ -359,12 +378,35 @@ export default function TALPHAAdsCommandTab() {
                 purchases: ads.reduce((s: number, a: any) => s + a.purchases, 0),
                 conversion_value: ads.reduce((s: number, a: any) => s + a.conversion_value, 0),
                 comments: ads.reduce((s: number, a: any) => s + a.comments, 0),
-                pos_orders: ads.reduce((s: number, a: any) => s + (a.orders || 0), 0),
-                pos_revenue: ads.reduce((s: number, a: any) => s + (a.revenue_vnd || 0), 0),
+                pos_orders: (posData?.pos_orders || 0) + (posData?.bot_orders || 0),
+                pos_revenue: (posData?.pos_revenue || 0) + (posData?.bot_revenue || 0),
+                bot_orders: posData?.bot_orders || 0,
+                bot_revenue: posData?.bot_revenue || 0,
             };
         }).sort((a, b) => b.spend - a.spend);
+
+        // Also add campaigns from data.campaigns that have POS orders but no active ads (inactive campaigns)
+        if (data?.campaigns) {
+            const existingCampIds = new Set(campaignRows.map(c => c.campaign_id));
+            data.campaigns.forEach((c: any) => {
+                if (!existingCampIds.has(c.campaign_id) && ((c.orders || 0) + (c.bot_orders || 0)) > 0) {
+                    campaignRows.push({
+                        account_id: c.account_id, campaign_id: c.campaign_id, campaign_name: c.campaign_name,
+                        effective_status: 'INACTIVE',
+                        spend: 0, impressions: 0, reach: 0, messages: 0, purchases: 0,
+                        conversion_value: 0, comments: 0,
+                        pos_orders: (c.orders || 0) + (c.bot_orders || 0),
+                        pos_revenue: (c.revenue_vnd || 0) + (c.bot_revenue_vnd || 0),
+                        bot_orders: c.bot_orders || 0,
+                        bot_revenue: c.bot_revenue_vnd || 0,
+                    });
+                }
+            });
+            campaignRows.sort((a, b) => b.spend - a.spend);
+        }
+
         return campaignRows;
-    }, [filteredAds]);
+    }, [filteredAds, campaignPosMap, data]);
 
     // ═══ posFromTable: Tính từ groupedCampaigns → luôn khớp với table ═══
     // Attribution logic: ad_id (Pass 1) + marketer name (Pass 1.5) đã xử lý ở model
