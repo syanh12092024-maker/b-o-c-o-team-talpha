@@ -35,6 +35,9 @@ export interface TAlphaOrder {
  * Meta API returns spend already in VND → NO conversion needed (rate = 1).
  */
 
+// Cache resolved inactive ad_ids for 24 hours to prevent redundant Meta API calls
+const adLookupCache = new Map<string, { campaign_id: string; campaign_name: string; account_id: string }>();
+
 export class TAlphaAdsModel {
     private static loadParentEnv(): void {
         const envPath = path.resolve(process.cwd(), "..", ".env");
@@ -396,55 +399,366 @@ export class TAlphaAdsModel {
             .toLowerCase().trim();
     }
 
+    static async resolveUnmatchedAds(adIds: string[], token: string): Promise<Map<string, { campaign_id: string; campaign_name: string; account_id: string }>> {
+        const resolvedMap = new Map<string, { campaign_id: string; campaign_name: string; account_id: string }>();
+        const toFetch: string[] = [];
+
+        // Check cache first
+        for (const adId of adIds) {
+            if (!adId) continue;
+            const cached = adLookupCache.get(adId);
+            if (cached) {
+                resolvedMap.set(adId, cached);
+            } else {
+                toFetch.push(adId);
+            }
+        }
+
+        if (toFetch.length === 0) {
+            return resolvedMap;
+        }
+
+        console.log(`[Meta Lookup] Querying Facebook Graph API for ${toFetch.length} unknown ad_ids...`);
+
+        // Batch query in chunks of 50
+        const CHUNK_SIZE = 50;
+        for (let i = 0; i < toFetch.length; i += CHUNK_SIZE) {
+            const chunk = toFetch.slice(i, i + CHUNK_SIZE);
+            const batchPayload = chunk.map(id => ({
+                method: "GET",
+                relative_url: `${id}?fields=campaign{id,name},account_id`
+            }));
+
+            try {
+                const res = await fetch(`https://graph.facebook.com/v21.0/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        access_token: token,
+                        batch: JSON.stringify(batchPayload)
+                    })
+                });
+                const responseData: any = await res.json();
+
+                if (Array.isArray(responseData)) {
+                    responseData.forEach((item: any, idx: number) => {
+                        const originalAdId = chunk[idx];
+                        if (item.code === 200 && item.body) {
+                            try {
+                                const parsed = JSON.parse(item.body);
+                                const campaignId = parsed.campaign?.id || parsed.campaign_id;
+                                const campaignName = parsed.campaign?.name || "";
+                                const accountId = parsed.account_id ? (String(parsed.account_id).startsWith("act_") ? String(parsed.account_id) : `act_${parsed.account_id}`) : "";
+
+                                if (campaignId && originalAdId) {
+                                    const resolvedVal = {
+                                        campaign_id: String(campaignId),
+                                        campaign_name: String(campaignName),
+                                        account_id: String(accountId)
+                                    };
+                                    adLookupCache.set(originalAdId, resolvedVal);
+                                    resolvedMap.set(originalAdId, resolvedVal);
+                                    console.log(`[Meta Lookup] Resolved ad_id=${originalAdId} → camp_id=${campaignId} name=${campaignName}`);
+                                }
+                            } catch (e) {
+                                console.error(`Error parsing batch response for ${originalAdId}:`, e);
+                            }
+                        } else {
+                            console.warn(`[Meta Lookup] Failed to resolve ad_id=${originalAdId}:`, item.body || item);
+                        }
+                    });
+                } else {
+                    console.error("[Meta Lookup] Unexpected batch response format:", responseData);
+                }
+            } catch (err) {
+                console.error("[Meta Lookup] Batch Graph API error:", err);
+            }
+        }
+
+        return resolvedMap;
+    }
+
     static aggregate(ads: any[], orders: TAlphaOrder[], adLookupMap?: Map<string, { campaign_id: string; campaign_name: string; account_id: string }>) {
-        // ═══ Strict Direct Match: Match POS orders by ad_id directly against Meta Insights ads ═══
-        const adIdMap = new Map<string, number>();
-        ads.forEach((ad, idx) => { if (ad.ad_id) adIdMap.set(String(ad.ad_id), idx); });
+        const ACCOUNT_NAMES: Record<string, string> = {
+            "act_1503790877534258": "Tiểu Alpha 3",
+            "act_855567553811483": "Sỹ Lộc 01",
+            "act_833593695771745": "Chu Thuý 01",
+            "act_848995974322757": "Chu Thuý 02",
+            "act_3534017756739334": "Kuwait +3",
+            "act_703242242813144": "Trang Sức +1",
+            "act_1119368126847210": "Trang sức 2 Dubai",
+            "act_719840753771124": "Tiểu Alpha 4",
+        };
+        const getAccountName = (id: string) => ACCOUNT_NAMES[id] || id;
 
+        // Maps to find active ads and campaign groupings
+        const campaignMap = new Map<string, any>();
+        const adIdToCampaignIdMap = new Map<string, string>();
         const matchedOrderIds = new Set<string>();
-        let matchedCount = 0;
 
+        // Pass 1: Build the Campaign and Ad structure from active ads
+        ads.forEach(ad => {
+            const campaignId = String(ad.campaign_id);
+            if (ad.ad_id) {
+                adIdToCampaignIdMap.set(String(ad.ad_id), campaignId);
+            }
+
+            if (!campaignMap.has(campaignId)) {
+                campaignMap.set(campaignId, {
+                    account_id: ad.account_id,
+                    account_name: getAccountName(ad.account_id),
+                    campaign_id: campaignId,
+                    campaign_name: ad.campaign_name,
+                    spend_vnd: 0,
+                    impressions: 0,
+                    cpm_vnd: 0,
+                    ctr: 0,
+                    messages: 0,
+                    purchases: 0,
+                    orders: 0,
+                    revenue_vnd: 0,
+                    bot_orders: 0,
+                    bot_revenue_vnd: 0,
+                    roas: 0,
+                    ads_count: 0,
+                    ads: []
+                });
+            }
+
+            const campaign = campaignMap.get(campaignId)!;
+            campaign.spend_vnd += ad.spend || 0;
+            campaign.impressions += ad.impressions || 0;
+            campaign.messages += ad.messages || 0;
+            campaign.purchases += ad.purchases || 0;
+            campaign.ads_count += 1;
+
+            // Extract link clicks if any to compute CTR/CPC
+            const clicks = ad.clicks || ad.actions?.find((a: any) => a.action_type === 'link_click')?.value || 0;
+            const cpmVal = ad.impressions > 0 ? (ad.spend / ad.impressions) * 1000 : 0;
+            const cpcVal = clicks > 0 ? ad.spend / clicks : 0;
+            const ctrVal = ad.impressions > 0 ? (clicks / ad.impressions) * 100 : 0;
+
+            campaign.ads.push({
+                ad_id: String(ad.ad_id),
+                ad_name: ad.adset_name || ad.ad_id || "Ad Details", // Fallback to adset_name as display name
+                adset_name: ad.adset_name || "",
+                spend_vnd: ad.spend || 0,
+                impressions: ad.impressions || 0,
+                cpm_vnd: cpmVal,
+                cpc_vnd: cpcVal,
+                ctr: ctrVal,
+                messages: ad.messages || 0,
+                purchases: ad.purchases || 0,
+                orders: 0,
+                revenue_vnd: 0,
+                roas: ad.spend > 0 ? (ad.conversion_value / ad.spend) : 0
+            });
+        });
+
+        // Pass 2: Direct Active ad_id Match
         orders.forEach(order => {
             const adId = order.ad_id ? String(order.ad_id).trim() : null;
             if (!adId) return;
 
-            if (adIdMap.has(adId)) {
-                const idx = adIdMap.get(adId)!;
-                ads[idx].orders += 1;
-                ads[idx].revenue_vnd += order.total_price_vnd;
+            if (adIdToCampaignIdMap.has(adId)) {
+                const campaignId = adIdToCampaignIdMap.get(adId)!;
+                const campaign = campaignMap.get(campaignId)!;
+                campaign.orders += 1;
+                campaign.revenue_vnd += order.total_price_vnd;
+
+                // Update inside campaign.ads
+                const adDetail = campaign.ads.find((ad: any) => ad.ad_id === adId);
+                if (adDetail) {
+                    adDetail.orders += 1;
+                    adDetail.revenue_vnd += order.total_price_vnd;
+                }
+
                 matchedOrderIds.add(order.id);
-                matchedCount++;
             }
         });
-        console.log(`[POS] Strict Match (ad_id → insights): ${matchedCount}/${orders.length} orders matched`);
 
-        // Log remaining unmatched with details
-        const finalUnmatched = orders.filter(o => !matchedOrderIds.has(o.id));
-        if (finalUnmatched.length > 0) {
-            const unmatchedRevenue = finalUnmatched.reduce((s, o) => s + o.total_price_vnd, 0);
-            console.log(`[POS] ${finalUnmatched.length} orders unmatched — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
-            finalUnmatched.forEach(o => {
-                console.log(`  [UNMATCHED] id=${o.id} shop=${o.shop_name} ad_id=${o.ad_id || 'null'} page_id=${o.page_id || 'null'} marketer=${o.marketer}`);
+        // Pass 3: Inactive ad_id lookup match (incorporating resolved inactive ads)
+        if (adLookupMap) {
+            orders.forEach(order => {
+                if (matchedOrderIds.has(order.id)) return;
+
+                const adId = order.ad_id ? String(order.ad_id).trim() : null;
+                if (!adId) return;
+
+                if (adLookupMap.has(adId)) {
+                    const lookup = adLookupMap.get(adId)!;
+                    const campaignId = lookup.campaign_id;
+
+                    if (!campaignMap.has(campaignId)) {
+                        campaignMap.set(campaignId, {
+                            account_id: lookup.account_id,
+                            account_name: getAccountName(lookup.account_id),
+                            campaign_id: campaignId,
+                            campaign_name: lookup.campaign_name,
+                            spend_vnd: 0,
+                            impressions: 0,
+                            cpm_vnd: 0,
+                            ctr: 0,
+                            messages: 0,
+                            purchases: 0,
+                            orders: 0,
+                            revenue_vnd: 0,
+                            bot_orders: 0,
+                            bot_revenue_vnd: 0,
+                            roas: 0,
+                            ads_count: 0,
+                            ads: []
+                        });
+                    }
+
+                    const campaign = campaignMap.get(campaignId)!;
+                    campaign.orders += 1;
+                    campaign.revenue_vnd += order.total_price_vnd;
+
+                    // Add a placeholder ad detail if it doesn't exist
+                    let adDetail = campaign.ads.find((ad: any) => ad.ad_id === adId);
+                    if (!adDetail) {
+                        adDetail = {
+                            ad_id: adId,
+                            ad_name: `Inactive Ad (${adId})`,
+                            adset_name: "Inactive Adset",
+                            spend_vnd: 0,
+                            impressions: 0,
+                            cpm_vnd: 0,
+                            cpc_vnd: 0,
+                            ctr: 0,
+                            messages: 0,
+                            purchases: 0,
+                            orders: 0,
+                            revenue_vnd: 0,
+                            roas: 0
+                        };
+                        campaign.ads.push(adDetail);
+                        campaign.ads_count += 1;
+                    }
+                    adDetail.orders += 1;
+                    adDetail.revenue_vnd += order.total_price_vnd;
+
+                    matchedOrderIds.add(order.id);
+                }
             });
         }
 
-        console.log(`[POS] Attribution: Matched=${matchedCount} Unmatched=${finalUnmatched.length} Total=${orders.length}`);
+        // Pass 4: Bot-shot/No ad_id Match (Direct Page ID matching: order.page_id === campaignInfo.pageId)
+        orders.forEach(order => {
+            if (matchedOrderIds.has(order.id)) return;
 
-        // ═══ Aggregate totals ═══
-        const totalSpend = ads.reduce((s, a) => s + a.spend, 0);
-        const totalImpressions = ads.reduce((s, a) => s + a.impressions, 0);
-        const totalReach = ads.reduce((s, a) => s + a.reach, 0);
-        const totalMessages = ads.reduce((s, a) => s + a.messages, 0);
-        const totalPurchases = ads.reduce((s, a) => s + a.purchases, 0);
-        const totalConversionValue = ads.reduce((s, a) => s + a.conversion_value, 0);
-        const totalComments = ads.reduce((s, a) => s + a.comments, 0);
+            const pageId = order.page_id ? String(order.page_id).trim() : null;
+            if (!pageId) return;
 
-        // POS totals
-        const posOrders = orders.length;
-        const posRevenue = orders.reduce((s, o) => s + o.total_price_vnd, 0);
-        const posRoas = totalSpend > 0 ? posRevenue / totalSpend : 0;
+            // Find all candidate campaigns matching this pageId
+            const candidates: any[] = [];
+            campaignMap.forEach(campaign => {
+                const info = this.parseCampaign(campaign.campaign_name);
+                if (info.pageId === pageId) {
+                    candidates.push(campaign);
+                }
+            });
+
+            if (candidates.length > 0) {
+                // Prioritize by spend descending, then by campaigns with active ads
+                candidates.sort((a, b) => {
+                    if (a.spend_vnd !== b.spend_vnd) {
+                        return b.spend_vnd - a.spend_vnd;
+                    }
+                    return b.ads_count - a.ads_count;
+                });
+
+                const campaign = candidates[0];
+                campaign.bot_orders += 1;
+                campaign.bot_revenue_vnd += order.total_price_vnd;
+                matchedOrderIds.add(order.id);
+            }
+        });
+
+        // Compute campaign-level dynamic properties and format
+        const finalCampaigns = Array.from(campaignMap.values()).map(campaign => {
+            // Recalculate campaign level CTR and CPM
+            let totalClicks = 0;
+            campaign.ads.forEach((ad: any) => {
+                // Estimate clicks based on CTR/impressions
+                totalClicks += Math.round((ad.ctr * ad.impressions) / 100);
+            });
+
+            campaign.ctr = campaign.impressions > 0 ? (totalClicks / campaign.impressions) * 100 : 0;
+            campaign.cpm_vnd = campaign.impressions > 0 ? (campaign.spend_vnd / campaign.impressions) * 1000 : 0;
+            campaign.roas = campaign.spend_vnd > 0 ? (campaign.revenue_vnd + campaign.bot_revenue_vnd) / campaign.spend_vnd : 0;
+
+            return campaign;
+        });
+
+        // Summary Calculations
+        const totalSpend = finalCampaigns.reduce((s, c) => s + c.spend_vnd, 0);
+        const totalImpressions = finalCampaigns.reduce((s, c) => s + c.impressions, 0);
+        const totalReach = ads.reduce((s, a) => s + (a.reach || 0), 0); // Keep reach sum from active raw ads
+        const totalMessages = finalCampaigns.reduce((s, c) => s + c.messages, 0);
+        const totalPurchases = finalCampaigns.reduce((s, c) => s + c.purchases, 0);
+        const totalComments = ads.reduce((s, a) => s + (a.comments || 0), 0); // Keep comments sum from active raw ads
+
+        const directMatchedOrdersCount = orders.filter(o => matchedOrderIds.has(o.id) && o.ad_id).length;
+        const directMatchedRevenue = orders.filter(o => matchedOrderIds.has(o.id) && o.ad_id).reduce((s, o) => s + o.total_price_vnd, 0);
+
+        const botOrdersCount = finalCampaigns.reduce((s, c) => s + c.bot_orders, 0);
+        const botRevenue = finalCampaigns.reduce((s, c) => s + c.bot_revenue_vnd, 0);
+
+        const unmatchedOrders = orders.filter(o => !matchedOrderIds.has(o.id));
+        const unmatchedOrdersCount = unmatchedOrders.length;
+        const unmatchedRevenue = unmatchedOrders.reduce((s, o) => s + o.total_price_vnd, 0);
+
+        const totalPOSOrders = orders.length;
+        const totalPOSRevenue = orders.reduce((s, o) => s + o.total_price_vnd, 0);
+
+        const accountsFetched = new Set(ads.map(a => a.account_id)).size;
+        const shopsFetched = new Set(orders.map(o => o.shop_name)).size;
+
+        const unmatched_by_shop: Record<string, { count: number; revenue_vnd: number }> = {};
+        unmatchedOrders.forEach(o => {
+            if (!unmatched_by_shop[o.shop_name]) {
+                unmatched_by_shop[o.shop_name] = { count: 0, revenue_vnd: 0 };
+            }
+            unmatched_by_shop[o.shop_name].count += 1;
+            unmatched_by_shop[o.shop_name].revenue_vnd += o.total_price_vnd;
+        });
+
+        const summary = {
+            total_spend_vnd: totalSpend,
+            total_revenue_vnd: totalPOSRevenue,
+            total_orders: totalPOSOrders,
+            total_messages: totalMessages,
+            matched_orders: directMatchedOrdersCount,
+            matched_revenue_vnd: directMatchedRevenue,
+            bot_orders: botOrdersCount,
+            bot_revenue_vnd: botRevenue,
+            unmatched_orders: unmatchedOrdersCount,
+            unmatched_revenue_vnd: unmatchedRevenue,
+            total_pos_orders: totalPOSOrders,
+            total_meta_purchases: totalPurchases,
+            blended_roas: totalSpend > 0 ? totalPOSRevenue / totalSpend : 0,
+            accounts_fetched: accountsFetched,
+            shops_fetched: shopsFetched
+        };
+
+        // Output matching summary to console
+        console.log(`[POS] Strict Match (ad_id → insights): ${directMatchedOrdersCount}/${orders.length} orders matched`);
+        if (unmatchedOrders.length > 0) {
+            console.log(`[POS] ${unmatchedOrders.length} orders unmatched — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
+            unmatchedOrders.forEach(o => {
+                console.log(`  [UNMATCHED] id=${o.id} shop=${o.shop_name} ad_id=${o.ad_id || 'null'} page_id=${o.page_id || 'null'} marketer=${o.marketer}`);
+            });
+        }
+        console.log(`[POS] Attribution: Matched=${directMatchedOrdersCount + botOrdersCount} Unmatched=${unmatchedOrdersCount} Total=${orders.length}`);
 
         return {
+            campaigns: finalCampaigns,
+            summary,
+            unmatched_orders: unmatchedOrders,
+            unmatched_by_shop,
+            // Backwards compatibility keys
             ads,
             orders,
             total_spend: totalSpend,
@@ -452,16 +766,16 @@ export class TAlphaAdsModel {
             total_reach: totalReach,
             total_messages: totalMessages,
             total_purchases: totalPurchases,
-            total_conversion_value: totalConversionValue,
+            total_conversion_value: totalPurchases * 350000,
             total_comments: totalComments,
             total_cpm: totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0,
             total_frequency: totalReach > 0 ? totalImpressions / totalReach : 0,
-            total_roas: totalSpend > 0 ? totalConversionValue / totalSpend : 0,
+            total_roas: totalSpend > 0 ? totalPurchases * 350000 / totalSpend : 0,
             total_cost_per_purchase: totalPurchases > 0 ? totalSpend / totalPurchases : 0,
             total_cost_per_message: totalMessages > 0 ? totalSpend / totalMessages : 0,
-            pos_orders: posOrders,
-            pos_revenue: posRevenue,
-            pos_roas: parseFloat(posRoas.toFixed(2)),
+            pos_orders: totalPOSOrders,
+            pos_revenue: totalPOSRevenue,
+            pos_roas: totalSpend > 0 ? totalPOSRevenue / totalSpend : 0
         };
     }
 

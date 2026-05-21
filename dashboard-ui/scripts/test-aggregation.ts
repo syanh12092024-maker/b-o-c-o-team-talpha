@@ -1,6 +1,6 @@
 import { TAlphaAdsModel, TAlphaOrder } from "../src/lib/bigquery/models/talpha-ads.model";
 
-// 1. Mock ads array
+// 1. Mock ads array (representing active ads with spend today)
 const mockAds = [
   {
     ad_id: "ad_123",
@@ -42,9 +42,9 @@ const mockAds = [
   }
 ];
 
-// 2. Mock orders array
+// 2. Mock orders array (covering all V5.2 mapping routes)
 const mockOrders: TAlphaOrder[] = [
-  // Case 1: Direct ad_id match
+  // Case 1: Direct active ad_id match (UAE)
   {
     id: "ord_1",
     shop_name: "UAE",
@@ -57,7 +57,7 @@ const mockOrders: TAlphaOrder[] = [
     inserted_at: "2026-05-21T10:00:00",
     customer_name: "John Doe"
   },
-  // Case 2: Direct ad_id match
+  // Case 2: Direct active ad_id match (Saudi)
   {
     id: "ord_2",
     shop_name: "Saudi",
@@ -70,12 +70,11 @@ const mockOrders: TAlphaOrder[] = [
     inserted_at: "2026-05-21T10:00:00",
     customer_name: "Jane Smith"
   },
-  // Case 3: ad_id not in ads today, but in adLookupMap (paused/blocked ad). 
-  // Under the new Strict Direct Match logic, this MUST remain UNMATCHED.
+  // Case 3: Inactive ad_id lookup match (ad_789 is resolved via Graph API lookup)
   {
     id: "ord_3",
     shop_name: "UAE",
-    ad_id: "ad_789", // not in mockAds
+    ad_id: "ad_789", // not in mockAds (active today)
     page_id: "Page1",
     marketer: "Marketer1",
     total_price_local: 50,
@@ -84,8 +83,7 @@ const mockOrders: TAlphaOrder[] = [
     inserted_at: "2026-05-21T10:00:00",
     customer_name: "Bob Johnson"
   },
-  // Case 4: No ad_id, but page_id matches mockAds campaign pageId (legacy Pass 3 fallback).
-  // Under the new Strict Direct Match logic, this MUST remain UNMATCHED.
+  // Case 4: Chatbot/Bot-shot order (no ad_id, matches camp_A by Page ID "Page1")
   {
     id: "ord_4",
     shop_name: "UAE",
@@ -109,7 +107,7 @@ mockAdLookupMap.set("ad_789", {
 });
 
 // Run aggregation
-console.log("Running TAlphaAdsModel.aggregate with test cases...");
+console.log("Running TAlphaAdsModel.aggregate with V5.2 test cases...");
 const result = TAlphaAdsModel.aggregate(JSON.parse(JSON.stringify(mockAds)), mockOrders, mockAdLookupMap);
 
 // Assertions
@@ -124,35 +122,43 @@ function assert(condition: boolean, message: string) {
   }
 }
 
-// 1. Direct matches should succeed
-const ad1 = result.ads.find(a => a.ad_id === "ad_123");
-assert(ad1 !== undefined, "ad_123 should exist in output ads");
-assert(ad1?.orders === 1, `ad_123 should have exactly 1 order, got ${ad1?.orders}`);
-assert(ad1?.revenue_vnd === 350000, `ad_123 revenue should be 350000, got ${ad1?.revenue_vnd}`);
+// Check structural campaigns array
+assert(Array.isArray(result.campaigns), "result should return a campaigns array");
+assert(result.campaigns.length === 3, `campaigns count should be exactly 3, got ${result.campaigns.length}`);
 
-const ad2 = result.ads.find(a => a.ad_id === "ad_456");
-assert(ad2 !== undefined, "ad_456 should exist in output ads");
-assert(ad2?.orders === 1, `ad_456 should have exactly 1 order, got ${ad2?.orders}`);
-assert(ad2?.revenue_vnd === 700000, `ad_456 revenue should be 700000, got ${ad2?.revenue_vnd}`);
+// 1. Check UAE active campaign (camp_A) direct orders and bot orders
+const campA = result.campaigns.find(c => c.campaign_id === "camp_A");
+assert(campA !== undefined, "UAE active campaign A should be present");
+assert(campA?.orders === 1, `camp_A should have 1 direct order, got ${campA?.orders}`);
+assert(campA?.bot_orders === 1, `camp_A should have 1 bot order, got ${campA?.bot_orders}`);
+assert(campA?.bot_revenue_vnd === 420000, `camp_A bot revenue should be 420000, got ${campA?.bot_revenue_vnd}`);
+assert(campA?.revenue_vnd === 350000, `camp_A direct revenue should be 350000, got ${campA?.revenue_vnd}`);
 
-// 2. Blocked ad (ad_789) should NOT be matched and no virtual campaign should be created in result.ads
-const ad3 = result.ads.find(a => a.ad_id === "ad_789" || a.campaign_id === "camp_C");
-assert(ad3 === undefined, "Blocked ad_789 / campaign camp_C should NOT be added to ads");
+// 2. Check Saudi active campaign (camp_B) direct orders
+const campB = result.campaigns.find(c => c.campaign_id === "camp_B");
+assert(campB !== undefined, "Saudi active campaign B should be present");
+assert(campB?.orders === 1, `camp_B should have 1 direct order, got ${campB?.orders}`);
+assert(campB?.bot_orders === 0, `camp_B should have 0 bot orders, got ${campB?.bot_orders}`);
 
-// 3. Page ID fallback (ord_4) should NOT be matched
-// If matched, ad1 would have orders = 2 and revenue = 350000 + 420000 = 770000.
-// Under strict matching, ord_4 is unmatched, so ad1 stays at orders = 1 and revenue = 350000.
-assert(ad1?.orders === 1, `ad1 should NOT match page_id fallback order (ord_4), orders got: ${ad1?.orders}`);
+// 3. Check Inactive dynamic placeholder campaign (camp_C)
+const campC = result.campaigns.find(c => c.campaign_id === "camp_C");
+assert(campC !== undefined, "Inactive campaign C should be dynamically injected");
+assert(campC?.orders === 1, `camp_C should have 1 direct order from resolved ad_789, got ${campC?.orders}`);
+assert(campC?.spend_vnd === 0, `camp_C spend should be 0, got ${campC?.spend_vnd}`);
+assert(campC?.revenue_vnd === 350000, `camp_C revenue should be 350000, got ${campC?.revenue_vnd}`);
+assert(campC?.account_id === "act_111", `camp_C should belong to act_111, got ${campC?.account_id}`);
 
-// 4. Check total matched count vs total orders
-// Total POS orders = 4. Only ord_1 and ord_2 should match. So matched = 2, unmatched = 2.
-const totalAdsOrders = result.ads.reduce((sum, a) => sum + a.orders, 0);
-assert(totalAdsOrders === 2, `Total matched orders in ads should be exactly 2, got ${totalAdsOrders}`);
+// 4. Summary check
+assert(result.summary !== undefined, "result should return a summary object");
+assert(result.summary.total_pos_orders === 4, `Summary total POS orders should be 4, got ${result.summary.total_pos_orders}`);
+assert(result.summary.matched_orders === 3, `Summary matched direct orders should be 3, got ${result.summary.matched_orders}`);
+assert(result.summary.bot_orders === 1, `Summary bot orders should be 1, got ${result.summary.bot_orders}`);
+assert(result.summary.unmatched_orders === 0, `Summary unmatched orders should be 0, got ${result.summary.unmatched_orders}`);
 
 if (failed) {
-  console.error("\n❌ Test suite FAILED!");
+  console.error("\n❌ TAlpha V5.2 Test suite FAILED!");
   process.exit(1);
 } else {
-  console.log("\n✨ All tests PASSED successfully!");
+  console.log("\n✨ All TAlpha V5.2 tests PASSED successfully!");
   process.exit(0);
 }
