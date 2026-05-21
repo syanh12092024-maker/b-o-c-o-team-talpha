@@ -26,10 +26,14 @@ export async function GET(req: NextRequest) {
             });
         }
 
+        // Step 1: Fetch ads and orders in parallel
+        const cfg = TAlphaAdsModel.loadConfig();
         const [{ ads, errors: metaErrors }, orders] = await Promise.all([
             TAlphaAdsModel.fetchMetaAds(fromDate, toDate),
             TAlphaAdsModel.fetchPOSHybrid(fromDate, toDate),
         ]);
+
+        // Step 2: Run aggregate directly (Strict Direct Match)
         const result = TAlphaAdsModel.aggregate(ads, orders);
 
         return NextResponse.json({
@@ -38,7 +42,10 @@ export async function GET(req: NextRequest) {
             date: fromDate,
             from_date: fromDate,
             to_date: toDate,
-            _debug: { ads_raw: ads.length, meta_errors: metaErrors || [] }
+            _debug: {
+                ads_raw: ads.length,
+                meta_errors: metaErrors || [],
+            }
         });
     } catch (error: any) {
         console.error("API ROUTE ERROR:", error);
@@ -60,6 +67,7 @@ export async function POST(req: NextRequest) {
             TAlphaAdsModel.fetchPOSHybrid(date, date),
         ]);
         const { ads } = metaResult;
+
         const result = TAlphaAdsModel.aggregate(ads, orders);
 
         const syncService = new GoogleSheetsSyncService(sheet_id);

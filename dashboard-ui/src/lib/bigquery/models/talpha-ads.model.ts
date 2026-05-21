@@ -3,7 +3,12 @@ import * as yaml from "js-yaml";
 import * as path from "path";
 import { runQuery, BQ_DATASET } from "../client";
 
-const YAML_PATH = path.resolve(process.cwd(), "config/projects/talpha.yaml");
+// Support both: cwd=dashboard-ui (local dev) and cwd=project-root (server/PM2)
+const YAML_PATH = (() => {
+    const fromCwd = path.resolve(process.cwd(), "config/projects/talpha.yaml");
+    if (fs.existsSync(fromCwd)) return fromCwd;
+    return path.resolve(process.cwd(), "..", "config/projects/talpha.yaml");
+})();
 
 export interface TAlphaConfig {
     meta_ads: { access_token: string; ad_account_ids: string[] };
@@ -31,9 +36,45 @@ export interface TAlphaOrder {
  */
 
 export class TAlphaAdsModel {
+    private static loadParentEnv(): void {
+        const envPath = path.resolve(process.cwd(), "..", ".env");
+        if (!fs.existsSync(envPath)) return;
+        const lines = fs.readFileSync(envPath, "utf-8").split("\n");
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith("#")) continue;
+            const eqIdx = trimmed.indexOf("=");
+            if (eqIdx < 0) continue;
+            const key = trimmed.slice(0, eqIdx).trim();
+            const val = trimmed.slice(eqIdx + 1).trim();
+            if (key && val && !(key in process.env)) {
+                process.env[key] = val;
+            }
+        }
+    }
+
+    private static resolveEnvVars(obj: unknown): unknown {
+        if (typeof obj === "string") {
+            const match = obj.match(/^\$\{(.+)\}$/);
+            if (match) return process.env[match[1]] || obj;
+            return obj;
+        }
+        if (Array.isArray(obj)) return obj.map(item => this.resolveEnvVars(item));
+        if (obj && typeof obj === "object") {
+            const result: Record<string, unknown> = {};
+            for (const [key, value] of Object.entries(obj)) {
+                result[key] = this.resolveEnvVars(value);
+            }
+            return result;
+        }
+        return obj;
+    }
+
     static loadConfig(): TAlphaConfig {
+        this.loadParentEnv();
         const raw = fs.readFileSync(YAML_PATH, "utf-8");
-        return yaml.load(raw) as TAlphaConfig;
+        const parsed = yaml.load(raw);
+        return this.resolveEnvVars(parsed) as TAlphaConfig;
     }
 
     static getExchangeRate(currency: string): number {
@@ -250,33 +291,38 @@ export class TAlphaAdsModel {
         return { ads: allAds, errors: metaErrors };
     }
 
+    // VN timezone offset — team manages from Vietnam, POS web shows VN time
+    private static VN_TZ_OFFSET = 7; // UTC+7
+
     static async fetchPOSHybrid(fromDate: string, toDate: string): Promise<TAlphaOrder[]> {
         const cfg = this.loadConfig();
 
         // ═══ FETCH ALL 8 SHOPS IN PARALLEL (saves ~10s) ═══
         const shopResults = await Promise.all(cfg.poscake.shops.map(async (shop) => {
             const shopOrders: TAlphaOrder[] = [];
-            try {
-                const currency =
-                    shop.name === "UAE" ? "AED" :
-                    shop.name === "Saudi" ? "SAR" :
-                    shop.name === "Kuwait" ? "KWD" :
-                    shop.name === "Oman" ? "OMR" :
-                    shop.name === "Qatar" ? "QAR" :
-                    shop.name === "Bahrain" ? "BHD" :
-                    shop.name === "Japan" ? "JPY" :
-                    shop.name === "Taiwan" ? "TWD" : "AED";
-                const rate = this.getExchangeRate(currency);
-                const isZeroDecimal = currency === "JPY";
+            const currency =
+                shop.name === "UAE" ? "AED" :
+                shop.name === "Saudi" ? "SAR" :
+                shop.name === "Kuwait" ? "KWD" :
+                shop.name === "Oman" ? "OMR" :
+                shop.name === "Qatar" ? "QAR" :
+                shop.name === "Bahrain" ? "BHD" :
+                shop.name === "Japan" ? "JPY" :
+                shop.name === "Taiwan" ? "TWD" : "AED";
+            const rate = this.getExchangeRate(currency);
+            const isZeroDecimal = currency === "JPY";
+            const tzOffset = this.VN_TZ_OFFSET; // UTC+7 — matches POS display for VN team
 
-                let currentPage = 1;
-                let totalPages = 1;
-                let reachedPastOrders = false;
+            let currentPage = 1;
+            let totalPages = 1;
+            let consecutiveOldOrders = 0;
+            let pageErrors = 0;
 
-                while (currentPage <= totalPages && !reachedPastOrders) {
+            while (currentPage <= totalPages && consecutiveOldOrders < 20 && pageErrors < 3) {
+                try {
                     const url = `${shop.api_url}/shops/${shop.shop_id}/orders?api_key=${shop.api_key}&page_number=${currentPage}`;
                     const controller = new AbortController();
-                    const timeout = setTimeout(() => controller.abort(), 10000);
+                    const timeout = setTimeout(() => controller.abort(), 30000);
                     const res = await fetch(url, { signal: controller.signal });
                     clearTimeout(timeout);
                     const data = await res.json();
@@ -289,11 +335,15 @@ export class TAlphaAdsModel {
                         const rawInserted = String(o.inserted_at || '');
                         if (!rawInserted) continue;
                         const utcMs = new Date(rawInserted + 'Z').getTime();
-                        const vnMs = utcMs + 7 * 60 * 60 * 1000;
-                        const vn = new Date(vnMs);
-                        const orderDate = `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}-${String(vn.getUTCDate()).padStart(2, '0')}`;
+                        const localMs = utcMs + tzOffset * 60 * 60 * 1000;
+                        const local = new Date(localMs);
+                        const orderDate = `${local.getUTCFullYear()}-${String(local.getUTCMonth() + 1).padStart(2, '0')}-${String(local.getUTCDate()).padStart(2, '0')}`;
 
-                        if (orderDate < fromDate) { reachedPastOrders = true; break; }
+                        if (orderDate < fromDate) {
+                            consecutiveOldOrders++;
+                        } else {
+                            consecutiveOldOrders = 0; // Reset counter when we see a non-old order
+                        }
 
                         if (orderDate >= fromDate && orderDate <= toDate) {
                             const rawCod = o.cod || o.total_price || 0;
@@ -312,12 +362,14 @@ export class TAlphaAdsModel {
                             });
                         }
                     }
-                    currentPage++;
-                    if (currentPage > 200) break;
+                } catch (e: any) {
+                    pageErrors++;
+                    console.error(`POS page error (${shop.name} p${currentPage}):`, e.message?.substring(0, 60) || e);
                 }
-            } catch (e) {
-                console.error(`POS Error (${shop.name}):`, e);
+                currentPage++;
+                if (currentPage > 200) break;
             }
+            console.log(`[POS] ${shop.name}: ${shopOrders.length} orders (scanned ${currentPage - 1} pages, tz=UTC+7)`);
             return shopOrders;
         }));
 
@@ -344,22 +396,16 @@ export class TAlphaAdsModel {
             .toLowerCase().trim();
     }
 
-    static aggregate(ads: any[], orders: TAlphaOrder[]) {
-        // Load marketer_map from config
-        const cfg = this.loadConfig();
-        const marketerMap: Record<string, string> = {};
-        (cfg.marketer_map || []).forEach((m: any) => {
-            marketerMap[this.normalizeName(m.pos_name)] = (m.campaign_key || '').toUpperCase();
-        });
-
-        // ═══ PASS 1: Match POS orders by ad_id (strict) ═══
+    static aggregate(ads: any[], orders: TAlphaOrder[], adLookupMap?: Map<string, { campaign_id: string; campaign_name: string; account_id: string }>) {
+        // ═══ Strict Direct Match: Match POS orders by ad_id directly against Meta Insights ads ═══
         const adIdMap = new Map<string, number>();
         ads.forEach((ad, idx) => { if (ad.ad_id) adIdMap.set(String(ad.ad_id), idx); });
 
         const matchedOrderIds = new Set<string>();
+        let matchedCount = 0;
 
         orders.forEach(order => {
-            const adId = order.ad_id ? String(order.ad_id) : null;
+            const adId = order.ad_id ? String(order.ad_id).trim() : null;
             if (!adId) return;
 
             if (adIdMap.has(adId)) {
@@ -367,127 +413,22 @@ export class TAlphaAdsModel {
                 ads[idx].orders += 1;
                 ads[idx].revenue_vnd += order.total_price_vnd;
                 matchedOrderIds.add(order.id);
+                matchedCount++;
             }
         });
+        console.log(`[POS] Strict Match (ad_id → insights): ${matchedCount}/${orders.length} orders matched`);
 
-        // ═══ PASS 2: Match by page_id + market (for orders without ad_id) ═══
-        // POS orders have page_id (Facebook Page the customer came from).
-        // Campaign names contain pageId at parts[3]: COUNTRY/MKT/Product/PageID/...
-        // Match: order.page_id === campaign.pageId AND order.shop_name maps to campaign.country
-
-        // Reverse market map: shop_name → campaign prefix (e.g. "Saudi" → "SAUDI")
-        const REVERSE_MARKET: Record<string, string> = {};
-        Object.entries(this.MARKET_MAP).forEach(([prefix, shopName]) => {
-            REVERSE_MARKET[shopName] = prefix;
-        });
-
-        // Build (market::pageId) → best ad index (highest spend)
-        const pageMarketMap = new Map<string, number>();
-        ads.forEach((ad, idx) => {
-            const info = this.parseCampaign(ad.campaign_name);
-            const pageId = (info.pageId || '').trim();
-            if (pageId && info.country) {
-                const key = `${info.country}::${pageId}`;
-                const existingIdx = pageMarketMap.get(key);
-                if (existingIdx === undefined || ad.spend > ads[existingIdx].spend) {
-                    pageMarketMap.set(key, idx);
-                }
-            }
-        });
-
-        // Match unmatched orders by page_id
-        let pass2Matched = 0;
-        orders.forEach(order => {
-            if (matchedOrderIds.has(order.id)) return;
-            const pageId = order.page_id ? String(order.page_id).trim() : null;
-            if (!pageId) return;
-
-            const marketPrefix = REVERSE_MARKET[order.shop_name];
-            if (!marketPrefix) return;
-
-            const key = `${marketPrefix}::${pageId}`;
-            const adIdx = pageMarketMap.get(key);
-            if (adIdx !== undefined) {
-                ads[adIdx].orders += 1;
-                ads[adIdx].revenue_vnd += order.total_price_vnd;
-                matchedOrderIds.add(order.id);
-                pass2Matched++;
-            }
-        });
-        if (pass2Matched > 0) {
-            console.log(`[POS] PASS 2 (page_id): ${pass2Matched} orders matched`);
-        }
-
-        // ═══ PASS 3: Match by marketer name + market (last resort) ═══
-        // For orders with no ad_id AND no matching page_id,
-        // use POS marketer name → campaign marketer key mapping.
-        // e.g. POS marketer "Trần Thế" → campaign key "N.THE"
-
-        // POS marketer name → campaign marketer key
-        const POS_MARKETER_MAP: Record<string, string> = {
-            [this.normalizeName("Trần Thế")]: "N.THE",   [this.normalizeName("Nguyễn Thế")]: "N.THE",
-            [this.normalizeName("Trần Ngọc Thế")]: "N.THE",
-            [this.normalizeName("Chu Thuý")]: "C.THUY",   [this.normalizeName("Chu Thị Thuý")]: "C.THUY",
-            [this.normalizeName("Sỹ Lộc")]: "LOC",        [this.normalizeName("Hồ Sỹ Lộc")]: "LOC",
-            [this.normalizeName("Sỹ Anh")]: "S.ANH",      [this.normalizeName("Hồ Sỹ Anh")]: "S.ANH",
-            [this.normalizeName("Thuùy Nhung")]: "NHUNG",  [this.normalizeName("Hoàng Thị Thuùy Nhung")]: "NHUNG",
-            [this.normalizeName("Nhung")]: "NHUNG",
-            [this.normalizeName("Thục Mai")]: "MAI",       [this.normalizeName("Phạm Hà Thục Mai")]: "MAI",
-            [this.normalizeName("Thục Bình")]: "BINH",     [this.normalizeName("Lê Thục Bình")]: "BINH",
-            [this.normalizeName("Mạnh")]: "MANH",          [this.normalizeName("N.Thế")]: "N.THE",
-        };
-        // Also load from config marketer_map (if defined)
-        Object.entries(marketerMap).forEach(([posName, campaignKey]) => {
-            POS_MARKETER_MAP[posName] = campaignKey;
-        });
-
-        // Build (market::marketerKey) → best ad index (highest spend)
-        const mktMarketMap = new Map<string, number>();
-        ads.forEach((ad, idx) => {
-            const info = this.parseCampaign(ad.campaign_name);
-            const mktKey = info.marketer; // already normalized uppercase no-diacritics
-            if (mktKey && info.country) {
-                const key = `${info.country}::${mktKey}`;
-                const existingIdx = mktMarketMap.get(key);
-                if (existingIdx === undefined || ad.spend > ads[existingIdx].spend) {
-                    mktMarketMap.set(key, idx);
-                }
-            }
-        });
-
-        // Match remaining unmatched orders by marketer + market
-        let pass3Matched = 0;
-        orders.forEach(order => {
-            if (matchedOrderIds.has(order.id)) return;
-
-            const marketPrefix = REVERSE_MARKET[order.shop_name];
-            if (!marketPrefix) return;
-
-            // Try to map POS marketer name → campaign key
-            const posMarketerNorm = this.normalizeName(order.marketer);
-            const campaignKey = POS_MARKETER_MAP[posMarketerNorm];
-            if (!campaignKey) return;
-
-            const key = `${marketPrefix}::${campaignKey}`;
-            const adIdx = mktMarketMap.get(key);
-            if (adIdx !== undefined) {
-                ads[adIdx].orders += 1;
-                ads[adIdx].revenue_vnd += order.total_price_vnd;
-                matchedOrderIds.add(order.id);
-                pass3Matched++;
-            }
-        });
-        if (pass3Matched > 0) {
-            console.log(`[POS] PASS 3 (marketer+market): ${pass3Matched} orders matched`);
-        }
-
-        // Log remaining unmatched
+        // Log remaining unmatched with details
         const finalUnmatched = orders.filter(o => !matchedOrderIds.has(o.id));
         if (finalUnmatched.length > 0) {
             const unmatchedRevenue = finalUnmatched.reduce((s, o) => s + o.total_price_vnd, 0);
-            const details = finalUnmatched.slice(0, 5).map(o => `${o.shop_name}/${o.marketer}/page:${o.page_id || 'N/A'}`).join(', ');
-            console.log(`[POS] ${finalUnmatched.length} orders still unmatched — ${unmatchedRevenue.toLocaleString()}đ — samples: ${details}`);
+            console.log(`[POS] ${finalUnmatched.length} orders unmatched — revenue: ${unmatchedRevenue.toLocaleString()}đ`);
+            finalUnmatched.forEach(o => {
+                console.log(`  [UNMATCHED] id=${o.id} shop=${o.shop_name} ad_id=${o.ad_id || 'null'} page_id=${o.page_id || 'null'} marketer=${o.marketer}`);
+            });
         }
+
+        console.log(`[POS] Attribution: Matched=${matchedCount} Unmatched=${finalUnmatched.length} Total=${orders.length}`);
 
         // ═══ Aggregate totals ═══
         const totalSpend = ads.reduce((s, a) => s + a.spend, 0);
