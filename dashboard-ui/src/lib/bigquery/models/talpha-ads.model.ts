@@ -702,19 +702,68 @@ export class TAlphaAdsModel {
             return campaign;
         });
 
-        // Summary Calculations
-        const totalSpend = finalCampaigns.reduce((s, c) => s + c.spend_vnd, 0);
-        const totalImpressions = finalCampaigns.reduce((s, c) => s + c.impressions, 0);
+        // ═══ MERGE: Gộp campaigns trùng pageId + product ═══
+        // Ví dụ: "SAUDI/N.THE/kem chống lão hóa đen/1101143709738580/Luxe Glow Skin KSA/15-4/"
+        //    và: "SAUDI/N.THE/kem chống lão hóa đen/1101143709738580/Luxe Glow Skin KSA/15-4"
+        // có 2 campaign_id khác nhau nhưng cùng sản phẩm → gộp lại thành 1 dòng
+        const mergeKey = (c: any) => {
+            const info = this.parseCampaign(c.campaign_name);
+            // Normalize: bỏ trailing slash, lowercase product
+            const product = this.normalizeName(info.product);
+            const pageId = (info.pageId || '').trim();
+            if (!pageId) return c.campaign_id; // No pageId → unique key = campaign_id
+            return `${info.country}/${info.marketer}/${product}/${pageId}`;
+        };
+
+        const mergedMap = new Map<string, any>();
+        for (const c of finalCampaigns) {
+            const key = mergeKey(c);
+            if (mergedMap.has(key)) {
+                const primary = mergedMap.get(key)!;
+                // Keep the campaign with highest spend as primary
+                if (c.spend_vnd > primary.spend_vnd) {
+                    // Current campaign has more spend → it becomes primary, absorb the old primary
+                    c.orders += primary.orders;
+                    c.revenue_vnd += primary.revenue_vnd;
+                    c.bot_orders += primary.bot_orders;
+                    c.bot_revenue_vnd += primary.bot_revenue_vnd;
+                    c.ads = [...c.ads, ...primary.ads];
+                    c.ads_count += primary.ads_count;
+                    // Recalculate ROAS with merged data
+                    c.roas = c.spend_vnd > 0 ? (c.revenue_vnd + c.bot_revenue_vnd) / c.spend_vnd : 0;
+                    mergedMap.set(key, c);
+                    console.log(`[MERGE] ${c.campaign_name} (spend=${c.spend_vnd}) absorbed ${primary.campaign_name} (+${primary.orders} orders, +${primary.bot_orders} bot)`);
+                } else {
+                    // Primary has more spend → absorb current campaign into primary
+                    primary.orders += c.orders;
+                    primary.revenue_vnd += c.revenue_vnd;
+                    primary.bot_orders += c.bot_orders;
+                    primary.bot_revenue_vnd += c.bot_revenue_vnd;
+                    primary.ads = [...primary.ads, ...c.ads];
+                    primary.ads_count += c.ads_count;
+                    // Recalculate ROAS with merged data
+                    primary.roas = primary.spend_vnd > 0 ? (primary.revenue_vnd + primary.bot_revenue_vnd) / primary.spend_vnd : 0;
+                    console.log(`[MERGE] ${primary.campaign_name} (spend=${primary.spend_vnd}) absorbed ${c.campaign_name} (+${c.orders} orders, +${c.bot_orders} bot)`);
+                }
+            } else {
+                mergedMap.set(key, c);
+            }
+        }
+        const mergedCampaigns = Array.from(mergedMap.values());
+
+        // Summary Calculations (use mergedCampaigns — đã gộp trùng)
+        const totalSpend = mergedCampaigns.reduce((s, c) => s + c.spend_vnd, 0);
+        const totalImpressions = mergedCampaigns.reduce((s, c) => s + c.impressions, 0);
         const totalReach = ads.reduce((s, a) => s + (a.reach || 0), 0); // Keep reach sum from active raw ads
-        const totalMessages = finalCampaigns.reduce((s, c) => s + c.messages, 0);
-        const totalPurchases = finalCampaigns.reduce((s, c) => s + c.purchases, 0);
+        const totalMessages = mergedCampaigns.reduce((s, c) => s + c.messages, 0);
+        const totalPurchases = mergedCampaigns.reduce((s, c) => s + c.purchases, 0);
         const totalComments = ads.reduce((s, a) => s + (a.comments || 0), 0); // Keep comments sum from active raw ads
 
         const directMatchedOrdersCount = orders.filter(o => matchedOrderIds.has(o.id) && o.ad_id).length;
         const directMatchedRevenue = orders.filter(o => matchedOrderIds.has(o.id) && o.ad_id).reduce((s, o) => s + o.total_price_vnd, 0);
 
-        const botOrdersCount = finalCampaigns.reduce((s, c) => s + c.bot_orders, 0);
-        const botRevenue = finalCampaigns.reduce((s, c) => s + c.bot_revenue_vnd, 0);
+        const botOrdersCount = mergedCampaigns.reduce((s, c) => s + c.bot_orders, 0);
+        const botRevenue = mergedCampaigns.reduce((s, c) => s + c.bot_revenue_vnd, 0);
 
         const unmatchedOrders = orders.filter(o => !matchedOrderIds.has(o.id));
         const unmatchedOrdersCount = unmatchedOrders.length;
@@ -764,7 +813,7 @@ export class TAlphaAdsModel {
         console.log(`[POS] Attribution: Matched=${directMatchedOrdersCount + botOrdersCount} Unmatched=${unmatchedOrdersCount} Total=${orders.length}`);
 
         return {
-            campaigns: finalCampaigns,
+            campaigns: mergedCampaigns,
             summary,
             unmatched_orders: unmatchedOrders,
             unmatched_by_shop,
