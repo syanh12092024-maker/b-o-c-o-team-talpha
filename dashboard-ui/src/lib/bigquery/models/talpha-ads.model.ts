@@ -13,6 +13,7 @@ const YAML_PATH = (() => {
 export interface TAlphaConfig {
     meta_ads: { access_token: string; ad_account_ids: string[] };
     poscake: { shops: Array<{ name: string; api_url: string; api_key: string; shop_id: string }>; shop_ids: string[] };
+    pancake?: { api_url: string; api_token: string; page_ids?: string[] };
     exchange_rates: Array<{ from: string; to: string; rate: number }>;
     marketer_map?: Array<{ pos_name: string; campaign_key: string }>;
 }
@@ -22,6 +23,8 @@ export interface TAlphaOrder {
     shop_name: string;
     ad_id: string | null;
     page_id: string | null;
+    post_id: string | null;
+    conversation_id: string | null;
     marketer: string;
     total_price_local: number;
     total_price_vnd: number;
@@ -364,8 +367,10 @@ export class TAlphaAdsModel {
                             shopOrders.push({
                                 id: String(o.id),
                                 shop_name: shop.name,
-                                ad_id: o.ad_id,
+                                ad_id: o.ad_id || null,
                                 page_id: o.page_id ? String(o.page_id) : null,
+                                post_id: o.post_id ? String(o.post_id) : null,
+                                conversation_id: o.conversation_id ? String(o.conversation_id) : null,
                                 marketer: o.marketer?.name || o.marketer || "N/A",
                                 total_price_local: priceLocal,
                                 total_price_vnd: priceLocal * rate,
@@ -486,6 +491,91 @@ export class TAlphaAdsModel {
         }
 
         return resolvedMap;
+    }
+
+    /**
+     * Tier 1: Cross-reference post_id — if another order with the same post_id has ad_id, use it.
+     * This works because multiple customers often interact with the same ad post.
+     */
+    static resolveAdIdsViaPostCrossRef(orders: TAlphaOrder[]): number {
+        // Build post_id → ad_id map from orders that HAVE ad_id
+        const postIdToAdId = new Map<string, string>();
+        for (const o of orders) {
+            if (o.ad_id && o.post_id) {
+                postIdToAdId.set(o.post_id, String(o.ad_id));
+            }
+        }
+
+        let resolved = 0;
+        for (const o of orders) {
+            if (!o.ad_id && o.post_id && postIdToAdId.has(o.post_id)) {
+                const inferredAdId = postIdToAdId.get(o.post_id)!;
+                console.log(`[PostXRef] Order ${o.id}: post_id=${o.post_id} → ad_id=${inferredAdId}`);
+                o.ad_id = inferredAdId;
+                resolved++;
+            }
+        }
+
+        if (resolved > 0) {
+            console.log(`[PostXRef] Resolved ${resolved} orders via post_id cross-reference`);
+        }
+        return resolved;
+    }
+
+    /**
+     * Tier 2: Pancake Conversation API — fetch ad_id from the conversation thread.
+     * When staff creates an order from a conversation, the conversation has the original ad_id
+     * but the order doesn't inherit it. This method bridges that gap.
+     */
+    static async resolveAdIdsFromConversations(orders: TAlphaOrder[], pancakeConfig?: { api_url: string; api_token: string }): Promise<number> {
+        if (!pancakeConfig?.api_token) {
+            console.log('[Pancake] No Pancake API token configured, skipping conversation lookup');
+            return 0;
+        }
+
+        const needsResolve = orders.filter(o => !o.ad_id && o.conversation_id && o.page_id);
+        if (needsResolve.length === 0) return 0;
+
+        console.log(`[Pancake] Looking up ${needsResolve.length} conversations for ad_id...`);
+        let resolved = 0;
+
+        // Process sequentially to avoid rate limits
+        for (const order of needsResolve) {
+            try {
+                // conversation_id format: "pageId_convId" — extract the convId part
+                const convParts = order.conversation_id!.split('_');
+                const convId = convParts.length > 1 ? convParts.slice(1).join('_') : order.conversation_id!;
+                const pageId = order.page_id!;
+
+                const url = `${pancakeConfig.api_url}/pages/${pageId}/conversations/${convId}?access_token=${pancakeConfig.api_token}`;
+                const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+                const data: any = await res.json();
+
+                if (data.error_code) {
+                    // Permission error or invalid — skip silently
+                    if (data.error_code !== 105) { // 105 = no page permission, expected for some pages
+                        console.warn(`[Pancake] Conv lookup failed for order ${order.id}: ${data.message}`);
+                    }
+                    continue;
+                }
+
+                // Look for ad_id in conversation data
+                const adId = data.ad_id || data.data?.ad_id || data.last_ad_id || data.data?.last_ad_id;
+                if (adId) {
+                    console.log(`[Pancake] Order ${order.id}: conversation → ad_id=${adId}`);
+                    order.ad_id = String(adId);
+                    resolved++;
+                }
+            } catch (e: any) {
+                // Timeout or network error — skip
+                console.warn(`[Pancake] Error for order ${order.id}: ${e.message?.substring(0, 60)}`);
+            }
+        }
+
+        if (resolved > 0) {
+            console.log(`[Pancake] Resolved ${resolved}/${needsResolve.length} orders via conversation API`);
+        }
+        return resolved;
     }
 
     static aggregate(ads: any[], orders: TAlphaOrder[], adLookupMap?: Map<string, { campaign_id: string; campaign_name: string; account_id: string }>) {

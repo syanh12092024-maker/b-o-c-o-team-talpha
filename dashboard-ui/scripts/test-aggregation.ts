@@ -50,6 +50,8 @@ const mockOrders: TAlphaOrder[] = [
     shop_name: "UAE",
     ad_id: "ad_123",
     page_id: "Page1",
+    post_id: null,
+    conversation_id: null,
     marketer: "Marketer1",
     total_price_local: 50,
     total_price_vnd: 350000,
@@ -63,6 +65,8 @@ const mockOrders: TAlphaOrder[] = [
     shop_name: "Saudi",
     ad_id: "ad_456",
     page_id: "Page2",
+    post_id: null,
+    conversation_id: null,
     marketer: "Marketer2",
     total_price_local: 100,
     total_price_vnd: 700000,
@@ -76,6 +80,8 @@ const mockOrders: TAlphaOrder[] = [
     shop_name: "UAE",
     ad_id: "ad_789", // not in mockAds (active today)
     page_id: "Page1",
+    post_id: null,
+    conversation_id: null,
     marketer: "Marketer1",
     total_price_local: 50,
     total_price_vnd: 350000,
@@ -88,7 +94,9 @@ const mockOrders: TAlphaOrder[] = [
     id: "ord_4",
     shop_name: "UAE",
     ad_id: null,
-    page_id: "Page1", // matches UAE/Marketer1/Prod1/Page1/Test
+    page_id: "Page1",
+    post_id: null,
+    conversation_id: null, // matches UAE/Marketer1/Prod1/Page1/Test
     marketer: "Marketer1",
     total_price_local: 60,
     total_price_vnd: 420000,

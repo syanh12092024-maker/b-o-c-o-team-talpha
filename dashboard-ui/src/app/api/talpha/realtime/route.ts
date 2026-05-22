@@ -33,7 +33,14 @@ export async function GET(req: NextRequest) {
             TAlphaAdsModel.fetchPOSHybrid(fromDate, toDate),
         ]);
 
-        // Step 1.5: Resolve unmatched ad_ids via Facebook Graph API lookups
+        // ═══ Step 1.5: Multi-tier ad_id resolution for orders without ad_id ═══
+        // Tier 1: Post-ID cross-reference (instant, no API calls)
+        const postXRefResolved = TAlphaAdsModel.resolveAdIdsViaPostCrossRef(orders);
+
+        // Tier 2: Pancake Conversation API (for orders still without ad_id)
+        const pancakeResolved = await TAlphaAdsModel.resolveAdIdsFromConversations(orders, cfg.pancake);
+
+        // Tier 3: Facebook Graph API — resolve ALL unmatched ad_ids (including newly resolved from Tier 1 & 2)
         const activeAdIds = new Set<string>(ads.map(ad => String(ad.ad_id)));
         const unmatchedAdIds = new Set<string>();
         orders.forEach(order => {
@@ -49,6 +56,8 @@ export async function GET(req: NextRequest) {
         if (unmatchedAdIds.size > 0) {
             adLookupMap = await TAlphaAdsModel.resolveUnmatchedAds(Array.from(unmatchedAdIds), cfg.meta_ads.access_token);
         }
+
+        console.log(`[Resolution] PostXRef=${postXRefResolved} Pancake=${pancakeResolved} GraphAPI=${adLookupMap.size} StillNoAdId=${orders.filter(o => !o.ad_id).length}`);
 
         // Step 2: Run aggregate with lookup map
         const result = TAlphaAdsModel.aggregate(ads, orders, adLookupMap);
@@ -86,7 +95,10 @@ export async function POST(req: NextRequest) {
         ]);
         const { ads } = metaResult;
 
-        // Resolve unmatched ad_ids
+        // ═══ Multi-tier ad_id resolution (same as GET) ═══
+        TAlphaAdsModel.resolveAdIdsViaPostCrossRef(orders);
+        await TAlphaAdsModel.resolveAdIdsFromConversations(orders, cfg.pancake);
+
         const activeAdIds = new Set<string>(ads.map(ad => String(ad.ad_id)));
         const unmatchedAdIds = new Set<string>();
         orders.forEach(order => {
