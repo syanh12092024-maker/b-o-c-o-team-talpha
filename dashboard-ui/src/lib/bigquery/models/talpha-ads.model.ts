@@ -75,6 +75,16 @@ export class TAlphaAdsModel {
 
     static loadConfig(): TAlphaConfig {
         this.loadParentEnv();
+        // ═══ Vercel: read YAML from env var ═══
+        if (process.env.TALPHA_YAML) {
+            try {
+                const parsed = yaml.load(process.env.TALPHA_YAML);
+                return this.resolveEnvVars(parsed) as TAlphaConfig;
+            } catch (e) {
+                console.error("[TAlpha] Failed to parse TALPHA_YAML env var:", e);
+            }
+        }
+        // ═══ Local/VPS: fallback to file on disk ═══
         const raw = fs.readFileSync(YAML_PATH, "utf-8");
         const parsed = yaml.load(raw);
         return this.resolveEnvVars(parsed) as TAlphaConfig;
